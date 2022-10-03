@@ -91,6 +91,7 @@
     (find-file (concat (projectile-acquire-root) "README.org"))
     )
   "pu" 'sp-backward-unwrap-sexp
+  "p <tab>" 'wally/projectile-recent-file
   "qc" 'quick-calc
   "rj" 'jump-to-register
   "rk" 'kill-rectangle
@@ -112,37 +113,46 @@
   "<tab>" 'spacemacs/alternate-buffer
   "`" 'wally/tmp
 
-  ";ac" 'wally/org-scramy-item
-  ";ad" 'wally/org-load-data-from-db
-  ";aE" 'wally/ann-export-source-list
-
-  ";ia" 'wally/org-add-new-subheading
-  ";cg" 'org-capture-goto-last-stored
-
+  ";Pc" 'wally/org-pomodoro-contine-current-task
   ";Vd" 'wally/video-download
   ";Vu" 'wally/video-update-info
   ";Vv" 'wally/evil-add-new-video
-  ";ee" 'wally/eval-last-sexp-and-join-result
+  ";aE" 'wally/ann-export-source-list
+  ";ac" 'wally/org-scramy-item
+  ";ad" 'wally/org-load-data-from-db
+  ";cg" 'org-capture-goto-last-stored
   ";ed" 'wally/edit-diff-temp-buffers
+  ";ee" 'wally/eval-last-sexp-and-join-result
   ";et" 'wally/edit-copy-region-to-tmp-buffer
   ";hn" 'wally/helm-quick-note
   ";hr" 'wally/helm-regexp
+  ";ia" 'wally/org-add-new-subheading
+  ";lR" 'leetcode-refresh
+  ";lS" 'wally/leetcode-save-current-problem
+  ";lc" 'wally/leetcode-start-c-or-cpp
+  ";le" 'wally/leetcode-export-to-anki-card
+  ";lg" nil
+  ";lgC" 'wally/leetcode-switch-to-cpp
+  ";lgt" 'wally/leetcode-switch-to-test
+  ";ll" 'leetcode
+  ";lq" 'leetcode-quit
+  ";lr" 'wally/leetcode-run
+  ";lt" 'leetcode-try
+  ";lu" 'leetcode-submit
   ";ma" 'wally/mindmap-add
   ";mc" 'wally/mindmap-convert
-  ";ot" 'org-tags-view
+  ";oe" 'wally/org-import-evernote
   ";oh" 'wally/org-yank-html-as-orgmode
   ";ol" 'wally/copyq-orglink
   ";or" 'wally/org-search-reference
   ";os" 'wally/org-sort-entries
-  ";rs" 'wally/edit-add-blank-line-for-region
-  ";oe" 'wally/org-import-evernote
-  "p <tab>" 'wally/projectile-recent-file
+  ";ot" 'org-tags-view
   ";pa" 'wally/pros-init
   ";pd" 'wally/pros-subtask-done
   ";pp" 'wally/pros-snapshot
   ";pr" 'wally/pros-goto-root
-  ";Pc" 'wally/org-pomodoro-contine-current-task
   ";pu" 'wally/pros-update-datetime
+  ";rs" 'wally/edit-add-blank-line-for-region
   ";vb" 'wally/video-import-bilibi
   )
 
