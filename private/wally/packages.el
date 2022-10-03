@@ -33,7 +33,6 @@
     ;; local
     (wally-utils :location local)
     (wally-dice :location local)
-    (wally-macros :location local)
     )
   "The list of Lisp packages required by the wally layer.
 
@@ -67,9 +66,6 @@ Each entry is either:
 
 (defun wally/init-wally-dice ()
   (use-package wally-dice))
-
-(defun wally/init-wally-macros ()
-  (use-package wally-macros))
 
 (defun wally/init-anki-editor ()
   (use-package anki-editor))
