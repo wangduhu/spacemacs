@@ -73,7 +73,7 @@ workspace
 /doc/COMMUNITY.org
 /doc/CONTRIBUTING.org
 /games/
-private/
+/private/snippets
 !private/README.md
 !private/snippets/README.md
 !private/templates/README.md
@@ -99,3 +99,5 @@ gtags.files
 eln-cache/
 meghanada/
 vimish-fold/
+/.persistent-scratch
+/projects

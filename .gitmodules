@@ -1,0 +1,6 @@
+[submodule "private/hugo"]
+	path = private/hugo
+	url = https://github.com/humanfactors/spacemacs-easy-hugo
+[submodule "private/leetcode"]
+	path = private/leetcode
+	url = https://github.com/anmoljagetia/leetcode-emacs-layer.git
