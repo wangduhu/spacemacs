@@ -759,6 +759,9 @@ before packages are loaded."
   (setq wally-evil-file-server (format "http://%s:4201" (get-ip-address "en0")))
   (setq wally-evil-file-root "/Volumes/Wally/Media/.party/.private")
 
+  ;; epc
+  (defvar wally-habit-epc (epc:start-epc "python3.9" '("/Users/wally/Project/empyc/srv/habit.py")))
+
   (eval-after-load "dired-aux"
     '(add-to-list 'dired-compress-file-suffixes
                   '("\\.zip\\'" ".zip" "unzip")))

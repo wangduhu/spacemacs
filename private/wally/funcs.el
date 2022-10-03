@@ -607,37 +607,32 @@ the calculated number of days."
           (next-line))
         (save-buffer)))))
 
-(defun wally/org-task-save-and-refresh-value ()
-  (interactive)
-  (let* ((title (wally/org-get-heading-no-progress))
-         (src-id (org-id-get-create))
-         (dst-id (s-reverse src-id))
-         (record-file (f-join wally-gtd-dir "wally.org"))
-         (value (org-entry-get nil "VALUE"))
-         )
-    (if (or (not value) (s-equals-p value "NIL"))
-        (message "no value set for %s" title)
-      (find-file-noselect record-file)
-      (if (not (org-id-find-id-in-file dst-id record-file))
-          (with-current-buffer (get-file-buffer record-file)
-            (goto-char (point-max))
-            (insert (format "
-* %s
-:PROPERTIES:
-:ID:       %s
-:END:
+(defun _wally/org-norm-value-property (value)
+  "转换数字或时间字符串为整数
+e.g.
+`30' -> 30
+`00:30' -> 30
+`23:45' -> -15
+"
+  (cond
+   ((string-match "^[0-9]+$" value)
+    (string-to-number value))
+   ((string-match "^\\([0-9][0-9]\\)[:\\.]\\([0-9][0-9]\\)$" value)
+    (let (hour minute total-minutes)
+      (setq hour (string-to-number (match-string-no-properties 1 value))
+            minute (string-to-number (match-string-no-properties 2 value))
+            total-minutes (+ minute (* 60 hour)))
+      (if (> total-minutes 1000)
+          (setq total-minutes (- total-minutes 1440)))
+      total-minutes))
+   (t -1)))
 
-|DATA|VALUE|
-|----+-----|
-" title dst-id))
-            ))
-      (with-current-buffer (get-file-buffer record-file)
-        (goto-char (cdr (org-id-find-id-in-file dst-id record-file)))
-        (org-mark-subtree)
-        (goto-char (region-beginning))
-        (re-search-forward "|$" (region-end) t 2)
-        (insert (format "\n|%s|%s|" (format-time-string "%Y-%m-%d" (current-time)) value))
-        (save-buffer))
+(defun wally/org-task-save-and-refresh-value ()
+  "存储heading的VALUE属性值后清零"
+  (let* ((value (org-entry-get nil "VALUE"))
+         (table (org-entry-get nil "TABLE")))
+    (when (and value table (not (s-equals-p value "NIL")))
+      (epc:call-sync wally-habit-epc 'record (list table (_wally/org-norm-value-property value) (format-time-string "%Y-%m-%d" (current-time))))
       (org-set-property "VALUE" "NIL")
       (save-buffer))))
 
