@@ -6,11 +6,11 @@
     calfw
     calfw-org
     cnfonts
-    ;; dirvish
+    dirvish
     easy-kill
     elisp-format
     emacsql-sqlite
-    ;; epc
+    epc
     highlight-function-calls
     nlinum-hl
     nov
@@ -34,6 +34,7 @@
     (wally-utils :location local)
     (wally-dice :location local)
     (wally-org :location local)
+    (wally-pros :location local)
     )
   "The list of Lisp packages required by the wally layer.
 
@@ -102,6 +103,10 @@ Each entry is either:
   (use-package emacsql-sqlite
     :config
     (setq mydb (emacsql-sqlite (format "%s/data/my.db" wally-journal-dir)))))
+
+(defun wally/init-epc ()
+  (use-package epc
+    ))
 
 (defun wally/init-highlight-function-calls ()
   (use-package highlight-function-calls))
@@ -460,4 +465,8 @@ marginparsep=7pt, marginparwidth=.6in}
 
 
 (defun wally/init-wally-org ()
-  (use-package wally-dice))
+  (use-package wally-org))
+
+
+(defun wally/init-wally-pros ()
+  (use-package wally-pros))
