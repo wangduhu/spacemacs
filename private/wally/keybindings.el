@@ -112,6 +112,10 @@
   "<tab>" 'spacemacs/alternate-buffer
   "`" 'wally/tmp
 
+  ";ac" 'wally/org-scramy-item
+  ";ad" 'wally/org-load-data-from-db
+  ";aE" 'wally/ann-export-source-list
+
   ";ia" 'wally/org-add-new-subheading
   ";cg" 'org-capture-goto-last-stored
 

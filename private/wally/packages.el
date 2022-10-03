@@ -35,6 +35,7 @@
     (wally-dice :location local)
     (wally-org :location local)
     (wally-pros :location local)
+    (wally-ann :location local)
     )
   "The list of Lisp packages required by the wally layer.
 
@@ -470,3 +471,6 @@ marginparsep=7pt, marginparwidth=.6in}
 
 (defun wally/init-wally-pros ()
   (use-package wally-pros))
+
+(defun wally/init-wally-ann ()
+  (use-package wally-ann))
