@@ -2142,21 +2142,6 @@ the calculated number of days."
     (widen)
     (message "Exit wally/spacemacs-get-function-list-under-current-heading") $func-list))
 
-(defun wally/org-babel-tangle()
-  (interactive)
-  (message "Enter wally/org-babel-tangle")
-  (let (tail)
-    (when (string-equal (f-filename (buffer-file-name)) "spacemacs.org")
-      (wally/file-quick-backup (expand-file-name "~/.spacemacs"))
-      (setq tail (shell-command-to-string  "sed -ne '/^;; Do not write anything past this comment/,$ p' ~/.spacemacs")))
-    (call-interactively 'org-babel-tangle)
-    (when tail
-      (shell-command "sed -i '/^;; Do not write anything past this comment/,$ d' ~/.spacemacs")
-      (with-temp-buffer
-        (insert (format "\n%s" tail))
-        (write-region nil nil "~/.spacemacs" t))))
-  (message "Exit wally/org-babel-tangle"))
-
 ;; 功能重合
 (defun wally/spacemacs-get-custom-tail-config ()
   (let ((dotspacemacs "~/.spacemacs")

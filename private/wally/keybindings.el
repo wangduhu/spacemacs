@@ -55,7 +55,7 @@
   "bs" 'spacemacs/switch-to-scratch-buffer
   "bo" 'wally/buf-switch-to-org-note-buffer
   "bt" 'wally/buf-switch-to-temp-buffer
-  "b <SPC>" '(lambda() (interactive) (find-file (f-join wally-journal-dir "data" "spacemacs.org")))
+  "b <SPC>" '(lambda() (interactive) (find-file "~/.emacs.d/private/dotspacemacs.el"))
   "cs" 'sp-copy-sexp
   "cz" 'ssh-deploy-prefix-map
   "ei" 'edit-indirect-region
@@ -147,7 +147,6 @@
   "p" 'org-pomodoro
   "yb" 'wally/macro-copy-org-src-block
   "vv" 'org-columns
-  "vt" 'wally/org-babel-tangle
   "iv" 'org-toggle-inline-images
   "gb" 'org-mark-ring-goto
   "gr" 'org-random-todo-goto-new
