@@ -1,7 +1,3 @@
-(require 'wally-utils)
-(require 'wally-dice)
-(require 'wally-macros)
-
 (defun wally@julie()
   (interactive)
   (message "wally@julie!")

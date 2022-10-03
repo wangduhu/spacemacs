@@ -30,6 +30,10 @@
     ssh-deploy
     vue-mode
     yasnippet
+    ;; local
+    (wally-utils :location local)
+    (wally-dice :location local)
+    (wally-macros :location local)
     )
   "The list of Lisp packages required by the wally layer.
 
@@ -58,6 +62,14 @@ Each entry is either:
       - A list beginning with the symbol `recipe' is a melpa
         recipe.  See: https://github.com/milkypostman/melpa#recipe-format")
 
+(defun wally/init-wally-utils ()
+  (use-package wally-utils))
+
+(defun wally/init-wally-dice ()
+  (use-package wally-dice))
+
+(defun wally/init-wally-macros ()
+  (use-package wally-macros))
 
 (defun wally/init-anki-editor ()
   (use-package anki-editor))
