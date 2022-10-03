@@ -33,6 +33,7 @@
     ;; local
     (wally-utils :location local)
     (wally-dice :location local)
+    (wally-org :location local)
     )
   "The list of Lisp packages required by the wally layer.
 
@@ -60,12 +61,6 @@ Each entry is either:
 
       - A list beginning with the symbol `recipe' is a melpa
         recipe.  See: https://github.com/milkypostman/melpa#recipe-format")
-
-(defun wally/init-wally-utils ()
-  (use-package wally-utils))
-
-(defun wally/init-wally-dice ()
-  (use-package wally-dice))
 
 (defun wally/init-anki-editor ()
   (use-package anki-editor))
@@ -454,3 +449,15 @@ marginparsep=7pt, marginparwidth=.6in}
                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
     )
   )
+
+
+(defun wally/init-wally-utils ()
+  (use-package wally-utils))
+
+
+(defun wally/init-wally-dice ()
+  (use-package wally-dice))
+
+
+(defun wally/init-wally-org ()
+  (use-package wally-dice))
