@@ -8,5 +8,9 @@
   (should (= (_wally/org-norm-value-property "23.30") -30))
   )
 
+(ert-deftest test:_wally/anki-is-note-existed ()
+  (should (= (wally/anki-is-note-existed "bose qc35") 1651384178161))
+  (should-not (wally/anki-is-note-existed "bose qc53")))
+
 
 (ert t)
