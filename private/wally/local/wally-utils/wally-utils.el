@@ -638,16 +638,16 @@ the calculated number of days."
     ;; join blank line
     (join-line)))
 
-(defun wally/func-quick-bind-key(command)
-  "bind current function to hotkey"
-  (interactive "Ccommand: ")
-  (spacemacs/set-leader-keys "." command))
+(defvar wally-quick-bind-func nil)
 
 (defun wally/func-quick-bind-key-at-point()
   (interactive)
-  (spacemacs/set-leader-keys "." '(lambda()
-                                    (interactive)
-                                    (funcall (intern (wally/func-get-name-at-point))))))
+  (let ((func (symbol-at-point)))
+    (message "binding %s" func)
+    (setq wally-quick-bind-func func)
+    (spacemacs/set-leader-keys "." '(lambda ()
+                                      (interactive)
+                                      (funcall wally-quick-bind-func)))))
 
 
 (provide 'wally-utils)

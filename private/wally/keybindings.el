@@ -262,7 +262,7 @@
 
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode
   "." 'eval-defun
-  "b" 'wally/func-quick-bind-key
+  "b" 'wally/func-quick-bind-key-at-point
   "f" '(lambda () (interactive) (elisp-format-buffer) (delete-trailing-whitespace))
   "if" 'wally/func-insert-entry-info-at-point
   )
