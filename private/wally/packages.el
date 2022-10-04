@@ -33,6 +33,7 @@
     ;; local
     (wally-utils :location local)
     (wally-dice :location local)
+    (wally-anki :location local)
     (wally-org :location local)
     (wally-pros :location local)
     (wally-ann :location local)
@@ -464,6 +465,10 @@ marginparsep=7pt, marginparwidth=.6in}
 
 (defun wally/init-wally-dice ()
   (use-package wally-dice))
+
+
+(defun wally/init-wally-anki ()
+  (use-package wally-anki))
 
 
 (defun wally/init-wally-org ()

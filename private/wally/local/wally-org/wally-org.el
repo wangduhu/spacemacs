@@ -899,12 +899,8 @@ e.g.
       (find-file roam-note))
 
     ;; anki note
-    (setq card-note (wally/org-anki-export id title level tags content))
-    (find-file card-note)
-    (anki-editor-mode t)
-
-    )
-  )
+    (setq card-note (wally/anki-export-org-heading id title level tags content))
+    (message "export anki note to <%s>" card-note)))
 
 (defun wally//org-roam-name-file (title)
   (format "%s-%s.org" (format-time-string "%Y%m%d%H%M%S" (current-time))
@@ -943,58 +939,6 @@ e.g.
       )
     filepath))
 
-
-(defun wally/org-anki-export (id title level tags content)
-  (let* ((filename (format-time-string "%Y%m%d%H%M%S.org" (current-time)))
-         (filepath (f-join (f-parent wally-journal-dir) "data" "card" filename))
-         myid)
-    (with-temp-buffer
-      (org-mode)
-      (insert (format "* %s
-:PROPERTIES:
-:NOTE_ID:   %s
-:ANKI_DECK: Notes
-:ANKI_NOTE_TYPE: Note
-:ANKI_TAGS: %s
-:END:
-
-** pros
-
-%s %s
-
-%s
-"
-                      title
-                      id
-                      (s-join " " tags)
-                      (make-string level ?*)
-                      title
-                      content
-                      ))
-      (goto-char (point-min))
-      (search-forward "pros" nil t 1)
-      (re-search-forward "^\\*" nil t 1)
-      (while (> level 3)
-        (org-promote-subtree)
-        (setq level (1- level)))
-      (while (< level 3)
-        (org-demote-subtree)
-        (setq level (1+ level))
-        )
-      (goto-char (point-max))
-      (insert "\n** cons\n\n")
-      (insert (format "- [[org-protocol://org-id?id=%s][inner note link]]\n\n" id))
-      (write-region (point-min) (point-max) filepath)
-      (message "export anki note to <%s>" filepath)
-      )
-    (find-file-noselect filepath)
-    (with-current-buffer (get-file-buffer filepath)
-      (goto-char (point-min))
-      (setq myid (org-id-get-create))
-      (goto-char (point-max))
-      (insert (format "- [[org-protocol://org-id?id=%s][inner anki link]]\n\n" myid))
-      )
-    filepath))
 
 (defun wally/org-everorg-post-process ()
   (interactive)
@@ -1271,46 +1215,6 @@ e.g.
         (insert custom-config)
         (save-buffer)))))
 
-(defun wally/anki-archive-org-heading()
-  (interactive)
-  (message "arch note heading to anki")
-  (let* ((temp-arch-file "/tmp/a.org")
-         (org-archive-location (format "%s::** pros" temp-arch-file)) head-outline content)
-    (write-region
-     "* ITEM\n:PROPERTIES:\n:ANKI_DECK: Notes\n:ANKI_NOTE_TYPE: Note\n:END:\n\n** pros\n\n** cons\n"
-     nil temp-arch-file)
-    (save-excursion (if (not (= (char-after) ?*))
-                        (outline-previous-heading))
-                    (setq head-outline (org-format-outline-path (org-get-outline-path t)))
-                    (org-mark-subtree)
-                    (setq content
-                          (buffer-substring
-                           (region-beginning)
-                           (region-end)))
-                    (org-archive-subtree)
-                    (evil-undo 1))
-    (find-file temp-arch-file)
-    (org-mode)
-    (goto-char (point-min))
-    (search-forward "** pros")
-    (next-line)
-    (insert (format "#+OPTIONS: ^:nil\n%s\n" head-outline))
-    (anki-editor-mode)
-    (anki-editor-push-notes)
-    ;; (erase-buffer)
-    (save-buffer)
-    (kill-buffer)))
-
-(setq wally-anki-customed-deck nil)
-
-(defun wally/anki-helm-custom-deck()
-  (interactive)
-  (let (source)
-    (setq source '((name . "anki decks")
-                   (candidates . ( "INBOX"))
-                   (action . (lambda(candidate)
-                               (setq wally-anki-customed-deck candidate)))))
-    (helm-other-buffer 'source "anki decks")))
 
 (defun wally/mindmap-add(title)
   (interactive "sTITLE: ")
