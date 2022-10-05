@@ -3,7 +3,7 @@
 (defconst wally-anki-dir (expand-file-name "~/Wally/data/card"))
 
 (defvar wally-anki-epc nil)
-(defvar wally-anki-epc-srv (expand-file-name "~/Project/empyc/srv/anki.py"))
+(defvar wally-anki-epc-srv (expand-file-name "~/Project/empyc/srv/anki/epcsrv.py"))
 
 
 (defmacro wally/with-tmp-anki-db (cond &rest body)
@@ -11,8 +11,9 @@
 TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs/elisp-macro.html
 "
   (declare (indent 1) (debug t))
-  (if wally-anki-epc
-      (epc:stop-epc wally-anki-epc))
+  (when wally-anki-epc
+    (epc:stop-epc wally-anki-epc)
+    (setq wally-anki-epc nil))
   (if (f-exists-p wally-tmp-anki-db)
       (f-delete wally-tmp-anki-db))
   (f-copy wally-anki-db wally-tmp-anki-db)

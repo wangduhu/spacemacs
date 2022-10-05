@@ -760,7 +760,7 @@ before packages are loaded."
   (setq wally-evil-file-root "/Volumes/Wally/Media/.party/.private")
 
   ;; epc
-  (defvar wally-habit-epc (epc:start-epc "python3.9" '("/Users/wally/Project/empyc/srv/habit.py")))
+  (defvar wally-habit-epc (epc:start-epc "python3.9" (list (expand-file-name "~/Project/empyc/srv/habit/epcsrv.py"))))
 
   (eval-after-load "dired-aux"
     '(add-to-list 'dired-compress-file-suffixes
