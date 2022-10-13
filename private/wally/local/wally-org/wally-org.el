@@ -1711,11 +1711,13 @@ e.g.
                         '("it" . "Expense:Technique:IT")
                         '("treatment" . "Expense:Health:Treatment")
                         '("railway" . "Expense:Travelling:Railway")
+                        '("beijing" . "Assets:Checking:BEIJINGBANK")
+                        '("yibao" . "Income:HealthInsurance")
                         '("" . "")
                         ))
       (puthash (car pair) (cdr pair) alias))
-    (if (not (string-match pattern heading))
-        (error "invalid org heading"))
+    (if (not (string-match "\\(.+\\) +:\\$\\(.+\\):\\$\\(.+\\):" (format "%s" heading)))
+        (error "invalid org heading: %S" heading))
     (setq desc (match-string 1 heading)
           src (match-string 2 heading)
           dst (match-string 3 heading))
@@ -1748,7 +1750,7 @@ e.g.
       (setq value (concat "-" value)))
      ;; 不支持的情况
      (t
-      (error "invalid org-heading"))
+      (error "valid but unsupported org-heading"))
      )
     (setq snippet (format "\n%4d-%02d-%02d %s\n    %s  %s CNY\n    %s\n" (nth 5 date) (nth 4 date) (nth 3 date) desc
                           first-account value second-account))
