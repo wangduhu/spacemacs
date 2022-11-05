@@ -1,3 +1,112 @@
+(defconst wally-dice-db (expand-file-name "~/Wally/data/db/dice.sqlite3"))
+(defvar wally-dice-epc nil)
+(defvar wally-dice-epc-srv (expand-file-name "~/Project/empyc/srv/dice/epcsrv.py"))
+
+
+(defun wally/dice-init-epc-srv ()
+  (when wally-dice-epc
+    (epc:stop-epc wally-dice-epc)
+    (setq wally-dice-epc nil))
+  (setq wally-dice-epc (epc:start-epc "python3.9" (list wally-dice-epc-srv))))
+
+
+(defmacro wally/with-dice-epc (cond &rest body)
+  "建立epc连接
+TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs/elisp-macro.html
+"
+  (declare (indent 1) (debug t))
+  (wally/dice-init-epc-srv)
+  `(if ,cond
+       (progn ,@body)))
+
+
+(defun wally/dice-epc-dice (table count)
+  (epc:call-sync wally-dice-epc 'dice (list table count)))
+
+
+(defun wally/dice-epc-query(table title)
+  (epc:call-sync wally-dice-epc 'query (list table title)))
+
+
+(defun wally/dice-epc-rate(table recid rate)
+  (if (epc:call-sync wally-dice-epc 'rate (list table recid rate))
+      (message "rate %d on %s<%d>" rate table recid)))
+
+
+(defun wally/dice-epc-add-item(table fields)
+  (if (epc:call-sync wally-dice-epc 'add_item (list table fields))
+      (message "add to table<%s>: %s" table fields)))
+
+
+(defun wally/dice-items(items)
+  (let (table count choice choices)
+    (wally/with-dice-epc t
+      (dolist (item items)
+        (setq table (car item)
+              count (cdr item)
+              choice (wally/dice-epc-dice table count))
+        (add-to-list 'choices (cons table choice))))
+    choices))
+
+
+(defun wally/dice-daily ())
+
+
+(defun wally/dice-update-dashboard ()
+  "更新dice面板"
+  )
+
+
+(defun wally/dice-rate ()
+  (let ((todo-status (org-entry-get nil "TODO"))
+        (priority (org-entry-get nil "PRIORITY"))
+        (rate 0))
+    (cond
+     ((s-equals-p "QUIT" todo-status) (setq rate -1))
+     ((s-equals-p "DONE" todo-status) (setq rate (- ?C (string-to-char priority)))))
+    rate))
+
+
+(defun wally/dice-make-kv (key val)
+  (list (make-symbol (format ":%s" key)) val))
+
+
+(defun wally/dice-add-item ()
+  "将当前heading添加到数据库中"
+  (interactive)
+  (let ((table (org-entry-get nil "DB_TBL" t))
+        (keys (org-entry-get nil "DB_KEYS" t))
+        (id-key (org-entry-get nil "DB_ID_KEY" t))
+        (title (nth 4 (org-heading-components)))
+        val
+        fields)
+    (if id-key
+        (setq fields (append fields (wally/dice-make-kv id-key title))))
+    (when keys
+      (setq keys (s-split " " keys))
+      (dolist (key keys)
+        (setq val (org-entry-get nil (upcase key)))
+        (if key
+            (setq fields (append fields (wally/dice-make-kv key val))))))
+    (if (and table fields)
+        (wally/dice-epc-add-item table fields))))
+
+
+(defun wally/dice-archive ()
+  "根据优先级和TODO状态刷新dice数据"
+  (interactive)
+  (let ((title (nth 4 (org-heading-components)))
+        (rate (wally/dice-rate))
+        (table (org-entry-get nil "DB_TBL" t))
+        (recid (org-entry-get nil "RECID")))
+    (when table
+      (if recid
+          (setq recid (string-to-numer recid))
+        (setq recid (wally/dice-epc-query table title)))
+      (if (not recid)
+          (message "rec not found: %s" title)
+        (wally/dice-epc-rate table recid rate)))))
+
 
 (defun wally//dice-item (head-id &optional count)
   (let (dice-repeat

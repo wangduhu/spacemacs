@@ -17,4 +17,17 @@
   (should-not (wally/logb-has-scramy-item-visited "foo" "bar"))
   )
 
+(ert-deftest test:wally/dice-items ()
+  (wally/dice-init-epc-srv)
+  ;; (should (= (length (wally/dice-items (list (cons "album" 1)))) 1)) ; no mock
+  (should (= (wally/dice-epc-query "book" "Flipped") 5))
+  ;; (should (wally/dice-epc-rate "book" 5 2)) ; no mock
+  (should-not (wally/dice-epc-rate "not_a_table" 5 2))
+  )
+
+(ert-deftest test:wally/dice-make-kv ()
+  (let ((item (wally/dice-make-kv "foo" "bar")))
+    (should (equal (symbol-name (car item)) ":foo"))
+    (should (equal (car (cdr item)) "bar"))))
+
 (ert t)
