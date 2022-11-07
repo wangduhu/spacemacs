@@ -38,35 +38,6 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
       (message "add to table<%s>: %s" table fields)))
 
 
-(defun wally/dice-items(items)
-  (let (table count choice choices)
-    (wally/with-dice-epc t
-      (dolist (item items)
-        (setq table (car item)
-              count (cdr item)
-              choice (wally/dice-epc-dice table count))
-        (add-to-list 'choices (cons table choice))))
-    choices))
-
-
-(defun wally/dice-daily ())
-
-
-(defun wally/dice-update-dashboard ()
-  "更新dice面板"
-  )
-
-
-(defun wally/dice-rate ()
-  (let ((todo-status (org-entry-get nil "TODO"))
-        (priority (org-entry-get nil "PRIORITY"))
-        (rate 0))
-    (cond
-     ((s-equals-p "QUIT" todo-status) (setq rate -1))
-     ((s-equals-p "DONE" todo-status) (setq rate (- ?C (string-to-char priority)))))
-    rate))
-
-
 (defun wally/dice-make-kv (key val)
   (list (make-symbol (format ":%s" key)) val))
 
@@ -92,6 +63,16 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
         (wally/dice-epc-add-item table fields))))
 
 
+(defun wally/dice-rate ()
+  (let ((todo-status (org-entry-get nil "TODO"))
+        (priority (org-entry-get nil "PRIORITY"))
+        (rate 0))
+    (cond
+     ((s-equals-p "QUIT" todo-status) (setq rate -1))
+     ((s-equals-p "DONE" todo-status) (setq rate (- ?C (string-to-char priority)))))
+    rate))
+
+
 (defun wally/dice-archive ()
   "根据优先级和TODO状态刷新dice数据"
   (interactive)
@@ -108,93 +89,106 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
         (wally/dice-epc-rate table recid rate)))))
 
 
-(defun wally//dice-item (head-id &optional count)
-  (let (dice-repeat
-        ids)
-    (if (not count)
-        (setq count 1))
-    (org-id-goto head-id)
-    (setq dice-repeat (org-entry-get nil "DICE_REPEAT"))
-    (while (> count 0)
-      (setq found nil
-            count (1- count))
-      (if dice-repeat
-          (progn
-            (wally//org-random-subheading)
-            (org-schedule nil "+0d")
-            (add-to-list 'ids (org-id-get-create))
-            )
-        (let ((max-try 7)
-              found
-              todo-state)
-          (while (and (not found) (> max-try 0))
-            (save-excursion
-              (wally//org-random-subheading)
-              (setq todo-state (org-get-todo-state))
-              (when (string-equal todo-state "TODO")
-                (setq found t)
-                (org-schedule nil "+0d")
-                (add-to-list 'ids (org-id-get-create))
-                )
-              (setq max-try (1- max-try)))))))
-    (save-buffer)
-    ids))
+(defun wally/dice-items(items)
+  (let (table count choice choices)
+    (wally/with-dice-epc t
+      (dolist (item items)
+        (setq table (car item)
+              count (cdr item)
+              choice (wally/dice-epc-dice table count))
+        (add-to-list 'choices (cons table choice))))
+    choices))
 
-(defun wally//dice-daily ()
-  (wally//dice-roam-note 3)
-  (let (candidates)
-    (dolist (cursor '(
-                      ("10485761-D155-4171-AC1C-FCFFDB0788C9" . 1) ; csquote
-                      ("BA64DE5E-2569-429E-BF48-7B8710AEE192" . 1) ; quote
-                      ("B2893492-3272-4DA0-A4D6-664C18CD5D47" . 1) ; lines
-                      ("9C8AFF18-C5AB-40A9-9A0A-049AB363EF9D" . 1) ; reading note
-                      ("D986C24E-AB0F-4FE4-B355-F39A5287C20D" . 1) ; poem
-                      ("E04A19F8-1307-4FA0-97EE-42C9544C6972" . 1) ; video
-                      ("749ADC0E-A002-44D2-9145-9666C868A4F8" . 1) ; stage photo
-                      ("825753B4-933F-41E6-A050-D8929AD70FB4" . 1) ; houlang
-                      ("647BC8DA-4EC0-4400-BD49-840AC15632C2" . 1) ; song
-                      ("9D72FA91-19DB-4B04-9F8F-849E10E18D65" . 1) ; painting
-                      ("6A7E9D3C-201E-45E2-B75B-1737F825992E" . 1) ; speech
-                      ("0582D866-5DC3-4548-BE14-9764964540E5" . 1) ; zhihu
-                      ))
-      (add-to-list 'candidates (wally//dice-item (car cursor) (cdr cursor))))
-    candidates))
 
-(defun wally//dice-weekly ()
-  (let (candidates)
-    (dolist (cursor '(
-                      ("3CEF3415-8C56-4534-AD0C-0D8D285E5C4A" . 3) ; movie
-                      ("0D2A1946-DB3A-498D-821D-5CEAED412A6F" . 1) ; album
-                      ("FC768912-0F4B-44C9-806A-B14125F03DCB" . 1) ; documentary
-                      ("4D04E979-9465-4902-BCD9-45CD37B35BEF" . 3) ; origami
-                      ("41BEC8FD-CD89-4C3F-9B04-19DBDBD6733E" . 1) ; tv series
-                      ("D077E770-B2C4-45DD-84CC-411CD44899B6" . 1) ; prose
-                      ))
-      (add-to-list 'candidates (wally//dice-item (car cursor) (cdr cursor))))
-    candidates))
+(defun wally/dice-update-dashboard (dashboard-id items)
+  (let (content)
+    (org-id-goto dashboard-id)
+    (org-mark-subtree)
+    (setq content (buffer-substring-no-properties (region-beginning) (region-end)))
+    (with-temp-buffer
+      (insert content)
+      (org-mode)
+      (goto-char (point-min))
+      ;; keep properties
+      (next-line)
+      (org-mark-element)
+      (delete-region (region-end) (point-max))
+      (deactivate-mark)
+      (goto-char (point-max))
+      (dolist (item items)
+        (insert (format "- [ ] %s\n" item)))
+      (setq content (buffer-substring-no-properties (point-min) (point-max)))
+      )
+    (kill-region (region-beginning) (region-end))
+    (insert content)
+    (insert "\n")
+    (deactivate-mark)
+    (save-buffer)))
 
-(defun wally//dice-monthly ()
-  (let (candidates)
-    (dolist (cursor '(
-                      ("3D907909-4EA0-4D6D-AF96-2B35893D2B8D" . 1) ; friends
-                      ("9BF6028D-2687-449D-9335-5244DFEE1EB0" . 2) ; reading
-                      ))
-      (add-to-list 'candidates (wally//dice-item (car cursor) (cdr cursor))))
-    candidates))
+
+(defun wally/dice-daily ()
+  (let ((candidates '(("csproverb" . 1)
+                      ("quotation" . 1)
+                      ("lines" . 1)
+                      ("readingnote" . 1)
+                      ("poem" . 1)
+                      ("stagephoto" . 1)
+                      ;; ("houlang" . 1)
+                      ("song" . 1)
+                      ("painting" . 1)
+                      ("speech" . 1))))
+    (wally/dice-items candidates)))
+
+
+(defun wally/dice-weekly ()
+  (let ((candidates '(("movie" . 1)
+                      ("album" . 1)
+                      ;; ("documentary" . 1)
+                      ("origami" . 1)
+                      ("teleplay" . 1)
+                      ("prose" . 1))))
+    (wally/dice-items candidates)))
+
+
+(defun wally/dice-monthly ()
+  (let ((candidates '(("friends" . 1)
+                      ;; ("reading" . 1)
+                      )))
+    (wally/dice-items candidates)))
+
 
 (defun wally/dice-rouinte ()
   (interactive)
-  (let ((evil (= 0 (mod (random 100) 73))))
-    (when evil
-      (wally//post-evil-dice (wally//dice-evil))))
   (let* ((date (decode-time (current-time)))
          (weekday (nth 6 date))
          (monthday (nth 3 date)))
     (when (equal monthday 1)
-      (wally//dice-monthly))
+      (wally/dice-update-dashboard "423825F1-6E75-4684-9886-863E7198FD22" (wally/dice-monthly)))
     (when (equal weekday 0)
-      (wally//dice-weekly))
-    (wally//dice-daily)))
+      (wally/dice-update-dashboard "2323282C-640E-40B5-9A79-B35ACDBA86BF" (wally/dice-weekly)))
+    (wally/dice-update-dashboard "8DAB48D4-1890-49DC-BACF-95DE275310A2" (wally/dice-daily))))
+
+
+(defun wally//dice-roam-note (count)
+  (let ((note-dir org-roam-directory)
+        (total-num 0)
+        notes note)
+    (dolist (f (directory-files note-dir))
+      (when (s-ends-with-p ".org" f)
+        (setq total-num (1+ total-num))
+        (add-to-list 'notes f)))
+    (while (> count 0)
+      (setq note (nth (random total-num) notes))
+      (setq note (f-join note-dir note))
+      (find-file-noselect note)
+      (with-current-buffer (get-file-buffer note)
+        (goto-char (point-min))
+        (re-search-forward "^\\* " nil t 1)
+        (replace-match "* TODO [#C] ")
+        (message "INFO roam note selected: %s" (buffer-substring (line-beginning-position) (line-end-position)))
+        (org-schedule nil "+1d")
+        (save-buffer))
+      (setq count (1- count)))))
 
 
 (defun wally/evil-view ()
