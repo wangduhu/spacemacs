@@ -12,6 +12,7 @@
     emacsql-sqlite
     epc
     highlight-function-calls
+    log4e
     nlinum-hl
     nov
     org
@@ -114,6 +115,13 @@ Each entry is either:
 
 (defun wally/init-highlight-function-calls ()
   (use-package highlight-function-calls))
+
+(defun wally/init-log4e ()
+  (use-package log4e
+    :config
+    (hoge--log-set-level 'debug 'fatal)
+    (hoge--log-enable-logging)
+    ))
 
 (defun wally/init-nlinum-hl ()
   (use-package nlinum-hl
@@ -364,6 +372,7 @@ Each entry is either:
           org-download-heading-lvl nil
           org-download-timestamp "%Y-%m-%d-%H-%M-%S"
           org-download-backend t)
+
     (setq wally-pros-note (f-join wally-gtd-dir "pros.org"))
     (setq wally-mindmap-dir (f-join wally-journal-dir "mindmap")
           wally-mindmap-title nil
