@@ -275,4 +275,31 @@
   (message "Exit wally/org-dateval-sync-image"))
 
 
+(defvar __projectile__ nil)
+
+(defun wally/projectile-recent-file()
+  (interactive)
+  (let ((root-dir (projectile-acquire-root))
+        (recent-file (car (projectile-recentf-files))))
+    (find-file (f-join root-dir recent-file))))
+
+(defun wally/projectile-switch-to-last-readme ()
+  (interactive)
+  (let ((buffers (buffer-list)))
+    (dolist (buffer buffers)
+      (when (s-index-of "README.org" (buffer-name buffer))
+        (switch-to-buffer buffer)
+        (cl-return)))))
+
+(defun wally/projectile-note-list ()
+  (let (project-note-paths path)
+    (dolist (project projectile-known-projects)
+      (setq path (f-join (f-expand project) "README.org"))
+      (if (f-exists-p path)
+          (add-to-list 'project-note-paths path)))
+    project-note-paths))
+
+;; (setq org-agenda-files (append (wally/projectile-note-list) org-agenda-files))
+
+
 (provide 'wally-pros)

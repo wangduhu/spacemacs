@@ -587,12 +587,6 @@ the calculated number of days."
                                   (browse-url (car bookmark))))))
           bookmark-alist)))
 
-(defun wally/projectile-recent-file()
-  (interactive)
-  (let ((root-dir (projectile-acquire-root))
-        (recent-file (car (projectile-recentf-files))))
-    (find-file (f-join root-dir recent-file))))
-
 (defun wally/log-next-recent-log()
   (interactive)
   (let ((pattern "\\[\\([a-zA-Z0-9_]+\\.[ch]\\):\\([0-9]+\\)\\]")
