@@ -88,7 +88,7 @@ This function should only modify configuration layer settings."
                                        auto-completion
                                        better-defaults
                                        (chinese :variables
-                                                chinese-default-input-method 'wubi
+                                                ;; chinese-default-input-method 'wubi
                                                 pangu-spacing-real-insert-separtor nil
                                                 chinese-enable-youdao-dict t)
                                        (c-c++ :variables
@@ -189,12 +189,12 @@ This function should only modify configuration layer settings."
                                        ;; private
                                        wally
                                        hugo
-                                       (leetcode :variables
-                                                 leetcode-save-solutions t
-                                                 leetcode-prefer-language "c"
-                                                 leetcode-prefer-sql "sqlite3"
-                                                 leetcode-directory "~/Project/codelet/source/solutions/C"
-                                                 )
+                                       ;; (leetcode :variables
+                                       ;;          leetcode-save-solutions t
+                                       ;;          leetcode-prefer-language "c"
+                                       ;;          leetcode-prefer-sql "sqlite3"
+                                       ;;          leetcode-directory "~/Project/codelet/source/solutions/C"
+                                       ;;          )
                                        )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these

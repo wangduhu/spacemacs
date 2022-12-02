@@ -100,7 +100,7 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
     choices))
 
 
-(defun wally/dice-update-dashboard (dashboard-id items)
+(defun wally/dice-update-dashboard (dashboard-id items &optional export)
   (let (content)
     (org-id-goto dashboard-id)
     (org-mark-subtree)
@@ -123,7 +123,9 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
     (insert content)
     (insert "\n")
     (deactivate-mark)
-    (save-buffer)))
+    (save-buffer)
+    (if export
+        (org-hugo-export-to-md))))
 
 
 (defun wally/dice-daily ()
@@ -166,7 +168,7 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
       (wally/dice-update-dashboard "423825F1-6E75-4684-9886-863E7198FD22" (wally/dice-monthly)))
     (when (equal weekday 0)
       (wally/dice-update-dashboard "2323282C-640E-40B5-9A79-B35ACDBA86BF" (wally/dice-weekly)))
-    (wally/dice-update-dashboard "8DAB48D4-1890-49DC-BACF-95DE275310A2" (wally/dice-daily))))
+    (wally/dice-update-dashboard "8DAB48D4-1890-49DC-BACF-95DE275310A2" (wally/dice-daily) t)))
 
 
 (defun wally//dice-roam-note (count)
