@@ -115,135 +115,6 @@
           (next-line))
         (save-buffer)))))
 
-(defun _wally/org-norm-value-property (value)
-  "转换数字或时间字符串为整数
-e.g.
-`30' -> 30
-`00:30' -> 30
-`23:45' -> -15
-"
-  (cond
-   ((string-match "^[0-9]+$" value)
-    (string-to-number value))
-   ((string-match "^\\([0-9][0-9]\\)[:\\.]\\([0-9][0-9]\\)$" value)
-    (let (hour minute total-minutes)
-      (setq hour (string-to-number (match-string-no-properties 1 value))
-            minute (string-to-number (match-string-no-properties 2 value))
-            total-minutes (+ minute (* 60 hour)))
-      (if (> total-minutes 1000)
-          (setq total-minutes (- total-minutes 1440)))
-      total-minutes))
-   (t -1)))
-
-(defun wally/org-task-save-and-refresh-value ()
-  "存储heading的VALUE属性值后清零"
-  (let* ((value (org-entry-get nil "VALUE"))
-         (table (org-entry-get nil "TABLE")))
-    (when (and value table (not (s-equals-p value "NIL")))
-      (epc:call-sync wally-habit-epc 'record (list table (_wally/org-norm-value-property value) (format-time-string "%Y-%m-%d" (current-time))))
-      (org-set-property "VALUE" "NIL")
-      (save-buffer))))
-
-(defun wally/org-auto-evaluate-daily()
-  (interactive)
-  (let (tmp-records
-        task-records
-        table
-        (gtd-note (f-join wally-gtd-dir "routine.org"))
-        (pros-note (f-join wally-gtd-dir "pros.org"))
-        (report-id "A3ADC23B-96C8-41AE-8C21-9B74798F0505")
-        )
-    (evil-write-all nil)
-    ;; gtd
-    (dolist (f  wally--org-eval-files)
-      (find-file-noselect f)
-      (with-current-buffer (get-file-buffer f)
-        (goto-char (point-min))
-        (setq tmp-records (org-map-entries '(lambda ()
-                                              (wally/org-task-save-and-refresh-value)
-                                              (wally/org-evaluate-task))
-                                           "WEIGHT>0")))
-      (setq task-records (append task-records tmp-records))
-      )
-    ;; viz
-    (setq table (wally//org-visualize-daily-routine task-records))
-    ;; (wally/logseq-add-journal table)
-    (org-id-goto report-id)
-    (org-narrow-to-subtree)
-    (org-show-subtree)
-    (next-line)
-    (re-search-forward "^\\*+ " nil t 1)
-    (if (org-at-heading-p)
-        (org-archive-subtree))
-    (goto-char (point-max))
-    (save-excursion
-      (insert table))
-    (next-line)
-    (if (org-at-heading-p)
-        (org-demote-subtree))
-    (widen)))
-
-(defun wally//org-visualize-daily-routine (records)
-  (let ($table (total 0) (finished 0) score)
-    (with-temp-buffer
-      (insert (format "\n|%s|WEIGHT|STATE|\n|-+-|-+-|-+-|-+-|\n" (format-time-string "%Y-%m-%d" (current-time))))
-      (dolist (record records)
-        (if record
-            (let ((weight (string-to-number (gethash "weight" record)))
-                  (state (gethash "state" record)))
-              (setq total (+ total weight))
-              (if (string-equal state "DONE")
-                  (setq finished (+ finished weight)))
-              (insert (format "|%s|%d|%s|\n"
-                              ;; (gethash "heading-id" record)
-                              (gethash "title" record)
-                              weight
-                              state))
-              )
-          ))
-      (setq score (/ (float finished ) (if (= total 0) 1 total)))
-      (insert (format "|-+-|-+-|-+-|-+-|\n|Summary| %d/%d |%s(%.2f)|\n\n\n" finished total (wally//org-evaluate-rank score) score))
-      (goto-char (point-min))
-      (save-excursion
-        (insert (format "\n* TODO [#%s] %s\n %s\n\n"
-                        (wally//org-evaluate-rank score)
-                        (format-time-string "%Y-%m-%d" (current-time))
-                        (format-time-string "SCHEDULED: <%Y-%m-%d %A %H:%M>" (current-time))
-                        )))
-      (org-mode)
-      (search-forward "* " nil t 1)
-      (org-set-property "SCORE" (format "%.2f" score))
-      (setq $table (buffer-substring-no-properties (point-min) (point-max)))
-      )
-    $table))
-
-(defun wally//org-evaluate-rank (score)
-  (cond
-   ((> score 0.85) "A")
-   ((> score 0.75) "B")
-   ((> score 0.65) "C")
-   (t "D")))
-
-(defun wally/org-evaluate-task()
-  (let ($record
-        (updated-date (org-entry-get nil "LAST_REPEAT"))
-        (today (format-time-string "%Y-%m-%d" (current-time)))
-        )
-    (when (string-equal (substring updated-date 1 11) today)
-      (let* ((states (wally//org-parse-logbook-states (wally//org-get-logbook)))
-             state)
-        (when states
-          (setq state (nth 0 states)
-                $record (make-hash-table :test 'equal))
-          (puthash "title" (wally/org-get-heading-no-progress) $record)
-          (puthash "heading-id" (org-id-get-create) $record)
-          (puthash "weight" (org-entry-get nil "WEIGHT") $record)
-          (if (string-equal (gethash "date" state) today)
-              (puthash "state" (gethash "new-state" state) $record)
-            (puthash "state" "QUIT" $record)))))
-    $record))
-
-
 (defun wally/org-clear-logbook ()
   (let ((pattern "^- State.+\[0-9-]+.+\]$"))
     (dolist (f wally--org-eval-files)
@@ -345,17 +216,6 @@ e.g.
   (let (org-log-done org-log-states)   ; turn off logging
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
-
-(defun wally/daily-report ()
-  (interactive)
-  (let ((id "BF55CF1E-1527-47FD-B551-43FDC4A34A55"))
-    ;; (wally/dice-daily)
-    (wally/org-auto-evaluate-daily)
-    ;; export
-    ;; (org-id-goto id)
-    ;; (wally/org-export-to-hugo)
-    )
-  )
 
 (defun wally/org-export-to-html ()
   "publish certain org files as html files"
@@ -1905,6 +1765,10 @@ e.g.
         )
       (write-region (point-min) (point-max) tmp-data-file))
     (shell-command (format "gnuplot -c %s" plt-script))))
+
+(defvar __eval__ nil)
+
+(defvar __routine__ nil)
 
 (defun wally/auto-misc-tasks ()
   (shell-command "dot_clean /Users/wally")
