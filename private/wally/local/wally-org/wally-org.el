@@ -1768,6 +1768,57 @@
 
 (defvar __eval__ nil)
 
+(defconst wally-org-pros-default-value "NIL")
+
+(defun wally/org-pros-get-value ()
+  (org-entry-get nil "VALUE"))
+
+(defun wally/org-pros-reset-value ()
+  (org-set-property "VALUE" wally-org-pros-default-value))
+
+(defun wally/org-pros-get-table ()
+  (org-entry-get nil "TABLE"))
+
+(defun wally/org-pros-norm-value (value)
+  "转换数字或时间字符串为整数
+e.g.
+`30' -> 30
+`00:30' -> 30
+`23:45' -> -15
+"
+  (cond
+   ((string-match "^[0-9]+$" value)
+    (string-to-number value))
+   ((string-match "^\\([0-9][0-9]\\)[:\\.]\\([0-9][0-9]\\)$" value)
+    (let (hour minute total-minutes)
+      (setq hour (string-to-number (match-string-no-properties 1 value))
+            minute (string-to-number (match-string-no-properties 2 value))
+            total-minutes (+ minute (* 60 hour)))
+      (if (> total-minutes 1000)
+          (setq total-minutes (- total-minutes 1440)))
+      total-minutes))
+   (t 0)))
+
+(defun wally/org-pros-record-value ()
+  "存储heading的VALUE属性值后清零"
+  (let* ((value (wally/org-pros-get-value))
+         (table (wally/org-pros-get-table))
+         (ts (format-time-string "%Y-%m-%d" (current-time))))
+    (when (and table value (not (s-equals-p value wally-org-pros-default-value)))
+      (setq value (wally/org-pros-norm-value value))
+      (message "insert into %s: %s" table value)
+      (epc:call-sync wally-habit-epc 'record (list table value ts))
+      (wally/org-pros-reset-value))))
+
+(defun wally/org-pros-collect-habit-data ()
+  (dolist (f  wally--org-eval-files)
+    (find-file-noselect f)
+    (with-current-buffer (get-file-buffer f)
+      (save-excursion
+        (goto-char (point-min))
+        (org-map-entries 'wally/org-pros-record-value "WEIGHT>0"))
+      (save-buffer))))
+
 (defvar __routine__ nil)
 
 (defun wally/auto-misc-tasks ()
@@ -1781,6 +1832,7 @@
   ;; (wally/ann-crawl-info)
   (evil-write-all nil)
   (wally/logseq-init-journal)
+  (wally/org-pros-collect-habit-data)
   (call-interactively 'wally/git-auto-save-repos)
   (call-interactively 'wally/org-agenda-auto-quit-on-timeout)
   (call-interactively 'wally/org-count-days)
