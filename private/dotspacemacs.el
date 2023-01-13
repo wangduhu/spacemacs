@@ -748,6 +748,8 @@ before packages are loaded."
               (modify-syntax-entry ?- "w")
               ))
 
+  (add-hook 'kill-buffer-hook 'wally/snap-auto-delete)
+
   (setq mac-command-modifier 'meta)
   (setq whitespace-line-column 121) ;; limit line length
   (setq whitespace-style '(face lines-tail))

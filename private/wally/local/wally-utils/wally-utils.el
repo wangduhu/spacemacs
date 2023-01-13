@@ -301,10 +301,15 @@
     (f-move src-file (format "%s/" dst-dir))
     (message "move %s to %s" src-file dst-dir)))
 
-(defvar wally-snap-suffix ".snap")
+
+;; snap utils
+(defvar __snap__ nil)
+
+(defconst wally-snap-dir (expand-file-name "~/.snap"))
+
 (defun wally/snap-auto-delete ()
   (let ((filepath (buffer-file-name)))
-    (when (s-ends-with-p wally-snap-suffix filepath)
+    (when (and filepath (s-equals-p wally-snap-dir (f-dirname filepath)))
       (save-buffer)
       (message "deleting %s" filepath)
       (f-delete filepath))))
@@ -316,14 +321,15 @@ TODO
 - [ ] map mirror buffer with current buffer
 "
   (interactive)
-  (let* ((snap-dir "~/.snap")
-         (src-file (buffer-file-name))
-         (dst-file (f-join snap-dir (format "%s.snap" (f-filename src-file))))
+  (let* ((src-file (buffer-file-name))
+         (dst-file (f-join wally-snap-dir (f-filename src-file)))
          (content (buffer-substring (point-min) (point-max)))
          )
-    (when (not (f-exists-p snap-dir))
-      (f-mkdir snap-dir)
-      (message "snap-dir created"))
+    (when (not (f-exists-p wally-snap-dir))
+      (f-mkdir wally-snap-dir)
+      (message "wally-snap-dir created"))
+    (if (s-ends-with-p ".gpg" dst-file)
+        (setq dst-file (substring dst-file 0 -4)))
     (when (f-exists-p dst-file)
       (f-delete dst-file)
       (message "remove dst-file(%s)" dst-file))

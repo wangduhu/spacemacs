@@ -6,8 +6,6 @@
   (end-of-line)
   (insert "\n#+attr_org: :width 500"))
 
-;; (add-hook 'kill-buffer-hook 'wally/snap-auto-delete)
-
 (defun wally/org-show-outline-path ()
   (interactive)
   (message (org-format-outline-path (org-get-outline-path))))
