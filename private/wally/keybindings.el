@@ -82,6 +82,7 @@
   "jE" 'sp-end-of-sexp
   "jf" 'xref-find-definitions
   "jp" 'xref-pop-marker-stack
+  "jr" 'xref-find-references
   "KR" 'wally/macro-repeat-to-end
   "pA" 'helm-projectile-ack
   "pG" 'projectile-find-tag

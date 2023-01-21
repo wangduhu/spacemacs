@@ -14,7 +14,6 @@
     highlight-function-calls
     log4e
     nlinum-hl
-    nov
     org
     org-dashboard
     org-media-note
@@ -130,15 +129,6 @@ Each entry is either:
                    (nlinum-mode nil)))
     ))
 
-(defun wally/init-nov ()
-  (use-package nov
-    ;; :bind
-    ;; (:map nov-mode-map
-    ;;       ((kbd "n") . scroll-up-command)
-    ;;       ((kbd "p") . scroll-down-command)
-    ;;       )
-    :mode "\\.epub\\'"))
-
 (defun wally/init-org-dashboard ()
   (use-package org-dashboard
     :after org
@@ -183,7 +173,8 @@ Each entry is either:
   (use-package org-super-agenda
     :config
     (setq org-super-agenda-groups
-          '((:name "IMPORTANT" :priority "A" :order 0)
+          '(
+            ;; (:name "IMPORTANT" :priority "A" :order 0)
             (:name "JULIE" :file-path "julie.org" :order 1)
             (:name "REFLECTION" :tag "REFLECTION" :order 1)
             (:name "PROGRESS" :file-path "pros.org" :order 1)
@@ -309,7 +300,7 @@ Each entry is either:
           ;;                        "----------------")
           org-agenda-files (append (list (f-join wally-refs-dir "index.org")
                                          (f-join wally-journal-dir "data" "reference.org")
-                                         "~/julie/works/README.org")
+                                         )
                                    (directory-files wally-gtd-dir t ".+\.org")
                                    (directory-files wally-note-dir t ".+\.org"))
           org-agenda-custom-commands (list '(";" "key tasks" agenda "" ((org-agenda-span 'day)
@@ -384,6 +375,11 @@ Each entry is either:
     (setq wally--org-eval-files (list (f-join wally-gtd-dir "routine.org")
                                       (f-join wally-gtd-dir "pros.org")
                                       (f-join wally-gtd-dir "julie.org")))
+
+    (org-crypt-use-before-save-magic)
+    (setq org-crypt-tag-matcher "secret")
+    (setq org-tags-exclude-from-inheritance (quote ("secret")))
+    (setq org-crypt-key nil)
 
     (org-babel-do-load-languages  'org-babel-load-languages
                                   '((C . t)

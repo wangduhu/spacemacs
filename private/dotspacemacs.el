@@ -133,6 +133,7 @@ This function should only modify configuration layer settings."
                                                elfeed-goodies/entry-pane-size
                                                0.5)
                                        emacs-lisp
+                                       epub
                                        finance
                                        ;; extra-langs
                                        git
@@ -162,6 +163,14 @@ This function should only modify configuration layer settings."
                                        markdown
                                        multiple-cursors
                                        nginx
+                                       (osx :variables osx-command-as       'hyper
+                                            osx-option-as        'meta
+                                            osx-control-as       'control
+                                            osx-function-as      nil
+                                            osx-right-command-as 'left
+                                            osx-right-option-as  'left
+                                            osx-right-control-as 'left
+                                            osx-swap-option-and-command nil)
                                        pandoc
                                        ;; pdf-tools
                                        pdf
@@ -187,14 +196,14 @@ This function should only modify configuration layer settings."
                                        treemacs
                                        yaml
                                        ;; private
-                                       wally
                                        hugo
-                                       ;; (leetcode :variables
-                                       ;;          leetcode-save-solutions t
-                                       ;;          leetcode-prefer-language "c"
-                                       ;;          leetcode-prefer-sql "sqlite3"
-                                       ;;          leetcode-directory "~/Project/codelet/source/solutions/C"
-                                       ;;          )
+                                       (myleetcode :variables
+                                                 leetcode-save-solutions t
+                                                 leetcode-prefer-language "c"
+                                                 leetcode-prefer-sql "sqlite3"
+                                                 leetcode-directory "~/Project/codelet/source/solutions/C"
+                                                 )
+                                       wally
                                        )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
