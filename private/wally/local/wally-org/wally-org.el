@@ -1860,5 +1860,100 @@ e.g.
   (run-at-time "5 sec" nil (lambda()
                              (evil-write-all t)
                              (message "ROUTINE DONE"))))
+(defvar __uhabits__ nil)
+
+(defconst wally-uhabits-data-dir (expand-file-name "~/Wally/uhabits/cache/"))
+
+(defun wally/pros-week-nth-day (n &optional date)
+  "获取指定日期date所在周的第n天的编码时间"
+  (let* ((now (decode-time date))
+         (current (decoded-time-weekday now))
+         target)
+    (setq target (decoded-time-add now (make-decoded-time :day (- n current))))
+    (encode-time target)))
+
+(defun wally/pros-week-start-date-str (&optional date)
+  "获取本周首日的字符串，形式为yyyy-mm-dd"
+  (format-time-string "%Y-%m-%d" (wally/pros-week-nth-day 0 date)))
+
+(defun wally/pros-week-next-week-start-date-str (&optional date)
+  "获取本周首日的字符串，形式为yyyy-mm-dd"
+  (format-time-string "%Y-%m-%d" (wally/pros-week-nth-day 7 date)))
+
+(defun wally/uhabits-get-weekly-done-times (habit-id &optional date limit)
+  "从uhabits数据中归档本周完成任务的次数"
+  (let ((count 0)
+        data-csv
+        line
+        value
+        func
+        done
+        (start-day (wally/pros-week-start-date-str date))
+        (end-day (wally/pros-week-next-week-start-date-str date)))
+    (message "week(%s~%s), limit(%s)" start-day end-day limit)
+    (dolist (d (f-directories wally-uhabits-data-dir))
+      (if (s-index-of (format "%03d" habit-id) d)
+          (setq data-csv (f-join wally-uhabits-data-dir d "Checkmarks.csv"))))
+    (if (not data-csv)
+        (message "no csv file found for target(%d)" habit-id)
+      (with-temp-buffer
+        (insert-file-contents data-csv)
+        (goto-char (point-min))
+        (while (not (eobp))
+          (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+          (setq done nil)
+          (when (and (s-less-p line end-day) (string-greaterp line start-day))
+            (if (not limit)
+                  (setq done t)
+              (setq value (string-to-number (nth 1 (s-split "," line))))
+              (if (> limit 0)
+                    (setq done (>= value limit))
+                (setq done (<= value (- limit)))))
+            (when done
+                (message "%s %s %s" line limit value)
+                (setq count (1+ count))))
+          (forward-line 1))))
+    count))
+
+(defun wally/pros-weekly-analyse-target (&optional date)
+  (let* ((target (wally//org-get-title))
+         (habit-desc (org-entry-get nil "HABIT"))
+         (habit-limit (org-entry-get nil "LIMIT"))
+         (habit-id (if habit-desc (wally/uhabits-get-id habit-desc)))
+         (week-count 0))
+    ;; 根据habit-desc获取habit-id, uhabits中的id不是固定的
+    (if (not habit-id)
+        (message "no habit related to target(%s)" target)
+      (if habit-limit (setq habit-limit (string-to-number habit-limit)))
+      (setq week-count (wally/uhabits-get-weekly-done-times habit-id date habit-limit)))
+    (org-set-property "WEEK_REAL" (format "%s" week-count))
+    (message "update target(%s) week count(%d)" target week-count)))
+
+(defun wally/uhabits-get-id (habit-desc)
+  "根据标题获取习惯ID"
+  (let ((habit-file (f-join wally-uhabits-data-dir "Habits.csv"))
+        line
+        habit-id)
+    (with-temp-buffer
+      (insert-file-contents habit-file)
+      (goto-char (point-min))
+      (while (not (eobp))
+        (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+        (if (s-index-of habit-desc line)
+            (setq habit-id (string-to-number (substring line 0 3))))
+        (forward-line 1)))
+    habit-id))
+
+(defun wally/pros-weekly-summary (&optional date)
+  (interactive)
+  (let ()
+    (find-file-noselect wally-pros-note)
+    (with-current-buffer (get-file-buffer wally-pros-note)
+      (save-excursion
+        (goto-char (point-min))
+        (org-map-entries
+         '(lambda ()
+            (if (org-entry-get nil "HABIT")
+                (wally/pros-weekly-analyse-target date))))))))
 
 (provide 'wally-org)
