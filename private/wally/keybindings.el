@@ -1,3 +1,4 @@
+(defconst __global__ nil)
 ;; (global-set-key [f6] 'spaceline-toggle-org-pomodoro)
 ;; (global-set-key [f5] '(lambda()
 ;;                         (interactive)
@@ -157,6 +158,9 @@
   ";vb" 'wally/video-import-bilibi
   )
 
+
+(defconst __orgmode__ nil)
+
 (spacemacs/set-leader-keys-for-major-mode 'org-mode
   ";" 'org-timer-set-timer
   "p" 'org-pomodoro
@@ -212,24 +216,17 @@
   "<tab>" 'wally/org-hiden-subtree
   )
 
+(spacemacs/set-leader-keys-for-major-mode 'org-journal-mode
+  "lh" 'wally/org-journal-format-heading
+  )
+
 (spacemacs/set-leader-keys-for-major-mode 'org-agenda-mode
   "p" 'org-pomodoro
   "v" 'wally/org-agenda-set-value
+  "," 'wally/org-agenda-done-with-note
+  "." 'wally/macro-agenda-done-with-clock
   )
 
-(evil-define-key 'normal c++-mode-map (kbd "M-n") '(lambda()
-                                                   (interactive)
-                                                   (wally/buf-scroll-first-buffer nil)))
-(evil-define-key 'normal c++-mode-map (kbd "M-p") '(lambda()
-                                                   (interactive)
-                                                   (wally/buf-scroll-first-buffer t)))
-
-(evil-define-key 'normal c-mode-map (kbd "M-n") '(lambda()
-                                                     (interactive)
-                                                     (wally/buf-scroll-first-buffer nil)))
-(evil-define-key 'normal c-mode-map (kbd "M-p") '(lambda()
-                                                     (interactive)
-                                                     (wally/buf-scroll-first-buffer t)))
 (evil-define-key 'normal org-mode-map (kbd "M-n") '(lambda()
                                                      (interactive)
                                                      (wally/buf-scroll-first-buffer nil)))
@@ -237,10 +234,8 @@
                                                      (interactive)
                                                      (wally/buf-scroll-first-buffer t)))
 
-(spacemacs/set-leader-keys-for-major-mode 'org-agenda-mode
-  "," 'wally/org-agenda-done-with-note
-  "." 'wally/macro-agenda-done-with-clock
-  )
+
+(defconst __programming__ nil)
 
 (spacemacs/set-leader-keys-for-major-mode 'web-mode
   "f" 'web-mode-fold-or-unfold
@@ -267,3 +262,17 @@
   "f" '(lambda () (interactive) (elisp-format-buffer) (delete-trailing-whitespace))
   "if" 'wally/func-insert-entry-info-at-point
   )
+
+(evil-define-key 'normal c++-mode-map (kbd "M-n") '(lambda()
+                                                     (interactive)
+                                                     (wally/buf-scroll-first-buffer nil)))
+(evil-define-key 'normal c++-mode-map (kbd "M-p") '(lambda()
+                                                     (interactive)
+                                                     (wally/buf-scroll-first-buffer t)))
+
+(evil-define-key 'normal c-mode-map (kbd "M-n") '(lambda()
+                                                   (interactive)
+                                                   (wally/buf-scroll-first-buffer nil)))
+(evil-define-key 'normal c-mode-map (kbd "M-p") '(lambda()
+                                                   (interactive)
+                                                   (wally/buf-scroll-first-buffer t)))

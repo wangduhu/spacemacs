@@ -328,6 +328,21 @@
       (add-to-list 'items (symbol-name (car rec))))
     items))
 
+(defconst __org-journal__ nil)
+(defconst __ledger__ nil)
+
+(defun wally/org-journal-format-heading ()
+  (let* ((filename (f-base (buffer-file-name)))
+         (date (parse-time-string (format "%s 00:00:00" (s-replace "_" "-" filename)))))
+    ;; remove single line with "*"
+    (goto-char (point-min))
+    (save-excursion
+      (flush-lines "^\\*$"))
+    ;; degrade top-level headings
+    (save-excursion
+      (replace-regexp "^\\* " "** "))
+    ;; insert top heading
+    (insert (format "* %s\n\n" (format-time-string org-journal-date-format (encode-time date))))))
 
 (defun wally/logseq-add-journal (note)
   (let* ((journal-root "~/Wally/logseq/journals")
