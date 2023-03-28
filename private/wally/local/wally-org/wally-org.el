@@ -170,7 +170,7 @@
   (let (($heading (org-get-heading t t t t))
         (pattern "\\(.+\\) +\\(\\[.+\\]\\)\\{1,2\\}$"))
     (when (string-match pattern $heading)
-      (setq $heading (match-string 1 $heading)))
+      (setq $heading (match-string-no-properties 1 $heading)))
     $heading))
 
 (defun wally/org-update-progress-by-refresh-subitem()
@@ -332,6 +332,7 @@
 (defconst __ledger__ nil)
 
 (defun wally/org-journal-format-heading ()
+  (interactive)
   (let* ((filename (f-base (buffer-file-name)))
          (date (parse-time-string (format "%s 00:00:00" (s-replace "_" "-" filename)))))
     ;; remove single line with "*"
@@ -1582,6 +1583,7 @@
                         '("drink" . "Expense:Diet:Drink")
                         '("health" . "Expense:Health:Health")
                         '("pet". "Expense:Entertainment:Pet")
+                        '("leisure". "Expense:Entertainment:Leisure")
                         '("socity" . "Expense:Socializing:Others")
                         '("family" . "Expense:Socializing:Family")
                         '("commissioncharge" . "Expense:Socializing:Others")
@@ -1851,16 +1853,16 @@ e.g.
   (interactive)
   ;; (wally/logb-auto-routine)
   ;; (wally/ann-crawl-info)
-  (evil-write-all nil)
-  (wally/logseq-init-journal)
-  (wally/org-pros-collect-habit-data)
-  (call-interactively 'wally/git-auto-save-repos)
+  ;; (evil-write-all nil)
+  ;; (wally/logseq-init-journal)
+  ;; (wally/org-pros-collect-habit-data)
+  ;; (call-interactively 'wally/git-auto-save-repos)
   ;; (call-interactively 'wally/org-agenda-auto-quit-on-timeout)
-  (call-interactively 'wally/org-count-days)
-  (call-interactively 'wally/dice-rouinte)
+  ;; (call-interactively 'wally/org-count-days)
+  ;; (call-interactively 'wally/dice-rouinte)
   ;; (call-interactively 'wally/daily-report)
   ;; (wally/auto-misc-tasks)
-  (evil-write-all nil)
+  ;; (evil-write-all nil)
 
   ;; pros snapshot
   ;; (call-interactively 'wally/pros-auto-update-progress-by-subitems)
@@ -1872,9 +1874,10 @@ e.g.
   ;; (call-interactively 'wally/auto-dateval-view)
   ;; (call-interactively 'wally/pros-dateval-sync-image)
 
-  (run-at-time "5 sec" nil (lambda()
-                             (evil-write-all t)
-                             (message "ROUTINE DONE"))))
+  ;; (run-at-time "5 sec" nil (lambda()
+  ;;                            (evil-write-all t)
+  ;;                            (message "ROUTINE DONE")))
+  )
 (defvar __uhabits__ nil)
 
 (defconst wally-uhabits-data-dir (expand-file-name "~/Wally/uhabits/cache/"))

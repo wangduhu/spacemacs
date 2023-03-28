@@ -917,7 +917,6 @@ Handle links like: org-protocol://open-file?file=/foo/ss/subdir/foo.js&line=132"
   ;; org-protocol end
 
   ;; mode
-  (display-time-mode 1)
   (engine-mode nil)
   (engine-mode t)
   (global-pangu-spacing-mode 1)
