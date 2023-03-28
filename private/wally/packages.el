@@ -1,45 +1,58 @@
+(defconst wally-os-packages
+  (cond
+   ((equal system-type 'darwin)
+    '(
+      anki-editor
+      annotate
+      calfw
+      calfw-org
+      cnfonts
+      dirvish
+      emacsql-sqlite
+      epc
+      highlight-function-calls
+      log4e
+      org-dashboard
+      org-media-note
+      org-noter
+      org-randomnote
+      org-random-todo
+      org-roam
+      org-roam-ui
+      simple-httpd
+      sr-speedbar
+      ssh-deploy
+      vue-mode
+      (wally-dice :location local)
+      (wally-anki :location local)
+      (wally-ann :location local)
+      (wally-leetcode :location local)
+      (wally-logb :location local)
+      ))
+   ;; termux下system-type的值为gun/linux
+   (t nil)
+   )
+  )
+
 (defconst wally-packages
-  '(
-    anki-editor
-    annotate
-    buttercup
-    calfw
-    calfw-org
-    cnfonts
-    dirvish
-    easy-kill
-    elisp-format
-    emacsql-sqlite
-    epc
-    highlight-function-calls
-    log4e
-    nlinum-hl
-    org
-    org-dashboard
-    org-media-note
-    org-noter
-    org-randomnote
-    org-random-todo
-    org-roam
-    org-roam-ui
-    org-super-agenda
-    ;; ox-latex
-    projectile
-    simple-httpd
-    sr-speedbar
-    ssh-deploy
-    vue-mode
-    yasnippet
-    ;; local
-    (wally-utils :location local)
-    (wally-dice :location local)
-    (wally-anki :location local)
-    (wally-org :location local)
-    (wally-logb :location local)
-    (wally-pros :location local)
-    (wally-ann :location local)
-    (wally-leetcode :location local)
-    )
+  (append
+   '(
+     buttercup
+     easy-kill
+     elisp-format
+     nlinum-hl
+     org
+     org-super-agenda
+     ;; ox-latex
+     projectile
+     yasnippet
+     ;; local
+     (wally-utils :location local)
+     (wally-org :location local)
+     (wally-pros :location local)
+     )
+   wally-os-packages
+   )
   "The list of Lisp packages required by the wally layer.
 
 Each entry is either:
