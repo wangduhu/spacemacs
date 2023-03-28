@@ -1,6 +1,9 @@
+(defvar wally-is-mac
+  (equal system-type 'darwin)
+  )
 (defconst wally-os-packages
   (cond
-   ((equal system-type 'darwin)
+   (wally-is-mac
     '(
       anki-editor
       annotate
@@ -378,46 +381,50 @@ Each entry is either:
           org-download-backend t)
 
     (setq wally-pros-note (f-join wally-gtd-dir "pros.org"))
-    (setq wally-mindmap-dir (f-join wally-journal-dir "mindmap")
-          wally-mindmap-title nil
-          wally-mindmap-filenameally-mindmap-filename nil)
 
-    (setq wally-video-note (f-join wally-dice-dir "inbox" "video.org") wally-video-title nil
-          wally-video-url nil wally-video-filename nil)
+    (when wally-is-mac
 
-    (setq wally--org-eval-files (list (f-join wally-gtd-dir "routine.org")
-                                      (f-join wally-gtd-dir "pros.org")
-                                      (f-join wally-gtd-dir "julie.org")))
+      (setq wally-mindmap-dir (f-join wally-journal-dir "mindmap")
+            wally-mindmap-title nil
+            wally-mindmap-filenameally-mindmap-filename nil)
 
-    (org-crypt-use-before-save-magic)
-    (setq org-crypt-tag-matcher "secret")
-    (setq org-tags-exclude-from-inheritance (quote ("secret")))
-    (setq org-crypt-key nil)
+      (setq wally-video-note (f-join wally-dice-dir "inbox" "video.org") wally-video-title nil
+            wally-video-url nil wally-video-filename nil)
 
-    (org-babel-do-load-languages  'org-babel-load-languages
-                                  '((C . t)
-                                    (python . t)
-                                    (java . t)
-                                    (emacs-lisp . t)
-                                    (shell . t)
-                                    (latex . t)
-                                    (plantuml . t)
-                                    (octave . t)
-                                    (dot . t)
-                                    ;; (ditaa . t)
-                                    ;; (gnuplot . t)
-                                    ;; (matlab . t)
-                                    ;; (org . t)
-                                    ;; (ruby . t)
-                                    ;; (awk . t)
-                                    ))
+      (setq wally--org-eval-files (list (f-join wally-gtd-dir "routine.org")
+                                        (f-join wally-gtd-dir "pros.org")
+                                        (f-join wally-gtd-dir "julie.org")))
 
-    ;; latex
-    (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.3))
+      (org-crypt-use-before-save-magic)
+      (setq org-crypt-tag-matcher "secret")
+      (setq org-tags-exclude-from-inheritance (quote ("secret")))
+      (setq org-crypt-key nil)
 
-    (add-to-list 'org-latex-classes
-                 '("cn-article"
-                   "\\documentclass[10pt,a4paper]{article}
+      (org-babel-do-load-languages  'org-babel-load-languages
+                                    '((C . t)
+                                      (python . t)
+                                      (java . t)
+                                      (emacs-lisp . t)
+                                      (shell . t)
+                                      (latex . t)
+                                      (plantuml . t)
+                                      (octave . t)
+                                      (dot . t)
+                                      ;; (ditaa . t)
+                                      ;; (gnuplot . t)
+                                      ;; (matlab . t)
+                                      ;; (org . t)
+                                      ;; (ruby . t)
+                                      ;; (awk . t)
+                                      ))
+
+
+      ;; latex
+      (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.3))
+
+      (add-to-list 'org-latex-classes
+                   '("cn-article"
+                     "\\documentclass[10pt,a4paper]{article}
 \\usepackage{ctex}
 \\usepackage{graphicx}
 \\usepackage{xcolor}
@@ -469,11 +476,12 @@ marginparsep=7pt, marginparwidth=.6in}
 \\tolerance=1000
 [NO-DEFAULT-PACKAGES]
 [NO-PACKAGES]"
-                   ("\\section{%s}" . "\\section*{%s}")
-                   ("\\subsection{%s}" . "\\subsection*{%s}")
-                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+                     ("\\section{%s}" . "\\section*{%s}")
+                     ("\\subsection{%s}" . "\\subsection*{%s}")
+                     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                     ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                     ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+      )
     )
   )
 
