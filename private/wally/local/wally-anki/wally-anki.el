@@ -110,6 +110,56 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
       (write-region card-content nil filepath)
       filepath)))
 
+(defun wally/anki-export-simple-note ()
+  "从org文件中导出简单卡片，内容只有标题"
+  (interactive)
+  (let ((card-buffer "*anki-card*")
+        (title (wally/org-get-heading-no-progress))
+        (content (wally/org-get-heading-content))
+        (deck (org-entry-get nil "ANKI_DECK" t))
+        (anki-id (org-entry-get nil "ANKI_NOTE_ID"))
+        (db-keys (org-entry-get nil "DB_KEYS" t))
+        (formatter (org-entry-get nil "FORMATTER" t))
+        value
+        db-kvs)
+    (if (not deck)
+        (error "no deck specified"))
+    (when formatter
+        (setq formatter (intern formatter))
+        (setq title (apply formatter (list title))))
+    (dolist (key (s-split " " db-keys))
+      (setq value (org-entry-get nil key))
+      (if (and value (not (equal "NA" value)))
+          (add-to-list 'db-kvs (cons key value))))
+    (with-current-buffer card-buffer
+      (erase-buffer)
+      (org-mode)
+      (save-excursion
+        (insert (format "* ITEM\n** pros\n%s\n" title))
+        (dolist (kv db-kvs)
+          (insert (format "\n%s:%s\n" (car kv) (cdr kv))))
+        (insert (format "\n%s\n" content))
+        (insert "** cons"))
+      (org-set-property "ANKI_DECK" deck)
+      (org-set-property "ANKI_NOTE_TYPE" "Note")
+      (anki-editor-mode t)
+      (if anki-id
+          (org-set-property "ANKI_NOTE_ID" anki-id))
+      (anki-editor-push-notes)
+      (if (not anki-id)
+          (setq anki-id (org-entry-get nil "ANKI_NOTE_ID"))))
+    (if (not anki-id)
+        (message "fail to export card: %s" title)
+      (org-set-property "ANKI_NOTE_ID" anki-id)
+      (message "anki card id: %s" anki-id))))
+
+(defun wally/format-lines (content)
+  (with-temp-buffer
+    (insert content)
+    (goto-char (point-min))
+    (replace-string "\\" "\n")
+    (buffer-substring-no-properties (point-min) (point-max))))
+
 
 ;; @DEPRECATED
 (defvar __wally-anki-customed-deck nil)
