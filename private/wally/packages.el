@@ -380,7 +380,7 @@ Each entry is either:
 
     (setq wally-pros-note (f-join wally-gtd-dir "pros.org"))
 
-    (when wally-is-mac
+    (when wally-is-pc
 
       (setq wally-mindmap-dir (f-join wally-journal-dir "mindmap")
             wally-mindmap-title nil

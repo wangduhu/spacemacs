@@ -535,6 +535,7 @@
         (setq snippet (org-table-get-constant "ITEM_SNIPPET")))
     (if (not snippet)
         (error "no snippet specified"))
+    (org-insert-subheading nil)
     (insert snippet)
     (yas-expand)))
 
