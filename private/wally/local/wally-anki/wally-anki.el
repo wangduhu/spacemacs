@@ -17,7 +17,7 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
   (if (f-exists-p wally-tmp-anki-db)
       (f-delete wally-tmp-anki-db))
   (f-copy wally-anki-db wally-tmp-anki-db)
-  (setq wally-anki-epc (epc:start-epc "python3.9" (list wally-anki-epc-srv)))
+  (setq wally-anki-epc (epc:start-epc "python3" (list wally-anki-epc-srv)))
   `(if ,cond
        (progn ,@body)))
 
@@ -25,7 +25,7 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
 (defun wally/anki-is-note-existed (title)
   "判断指定title的anki note是否已存在于数据库中，存在返回note id，否则返回nil"
   (wally/with-tmp-anki-db t
-                          (epc:call-sync wally-anki-epc 'query_note (list title))))
+    (epc:call-sync wally-anki-epc 'query_note (list title))))
 
 
 (defun wally/anki-get-exported-card ()
@@ -110,6 +110,31 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
       (write-region card-content nil filepath)
       filepath)))
 
+(defun wally/org-get-item-filepath ()
+  (let ((parent-dir (org-entry-get nil "PARENT_DIR" t))
+        (filename (org-entry-get nil "FILENAME"))
+        filepath)
+    (if (not parent-dir)
+        (message "no property: PARENT_DIR")
+      (if (not filename)
+          (message "no property: FIALENAME")
+        (setq filepath (f-join parent-dir filename))
+        (if (not (f-exists-p filepath))
+            (message "no such file: %s" filepath)
+          filepath)))))
+
+(defun wally/org-get-heading-content ()
+  (let (content)
+    (org-mark-subtree)
+    (setq content (buffer-substring-no-properties (region-beginning) (region-end)))
+    (deactivate-mark)
+    (with-temp-buffer
+      (insert content)
+      (goto-char (point-min))
+      (search-forward ":END:" nil t)
+      (setq content (buffer-substring-no-properties (line-end-position) (point-max))))
+    content))
+
 (defun wally/anki-export-simple-note ()
   "从org文件中导出简单卡片，内容只有标题"
   (interactive)
@@ -120,13 +145,21 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
         (anki-id (org-entry-get nil "ANKI_NOTE_ID"))
         (db-keys (org-entry-get nil "DB_KEYS" t))
         (formatter (org-entry-get nil "FORMATTER" t))
+        (is-image (org-entry-get nil "IMAGE" t))
+        imge-url
         value
         db-kvs)
     (if (not deck)
         (error "no deck specified"))
+    (when is-image
+      (let ((image-path (wally/org-get-item-filepath))
+            (srv-prefix (org-entry-get nil "SRV_PREFIX" t))
+            (image-srv "http://localhost:7001/img"))
+        (if (and image-path srv-prefix)
+            (setq image-url (s-join "/" (list image-srv srv-prefix (f-filename image-path)))))))
     (when formatter
-        (setq formatter (intern formatter))
-        (setq title (apply formatter (list title))))
+      (setq formatter (intern formatter))
+      (setq title (apply formatter (list title))))
     (dolist (key (s-split " " db-keys))
       (setq value (org-entry-get nil key))
       (if (and value (not (equal "NA" value)))
@@ -136,6 +169,8 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
       (org-mode)
       (save-excursion
         (insert (format "* ITEM\n** pros\n%s\n" title))
+        (if image-url
+            (insert (format "\n#+HTML: <img src=\"%s\"/>\n" image-url)))
         (dolist (kv db-kvs)
           (insert (format "\n%s:%s\n" (car kv) (cdr kv))))
         (insert (format "\n%s\n" content))
@@ -159,6 +194,13 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
     (goto-char (point-min))
     (replace-string "\\" "\n")
     (buffer-substring-no-properties (point-min) (point-max))))
+
+(defun wally/anki-query-and-set-anki-id ()
+  (let ((title (wally/org-get-heading-no-progress))
+        iid)
+    (setq iid (wally/anki-is-note-existed (substring-no-properties title)))
+    (if iid
+        (org-set-property "ANKI_NOTE_ID" (format "%d" iid)))))
 
 
 ;; @DEPRECATED
