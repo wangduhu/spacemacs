@@ -380,8 +380,7 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(tsdh-light
-                         spacemacs-dark
+   dotspacemacs-themes '(spacemacs-light
                          spacemacs-light)
 
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
@@ -964,8 +963,23 @@ Handle links like: org-protocol://open-file?file=/foo/ss/subdir/foo.js&line=132"
   ;; action
   (server-start)
   (httpd-start)
+
+  ;; tmp
+  (defun wally/org-set-default-line-spacing ()
+    (setq-local line-spacing 0.25))
+  (add-hook 'org-mode-hook 'wally/org-set-default-line-spacing)
+
+
+  (defun wally/text-mode-set-line-width ()
+    (setq-local fill-column 180))
+
+  (define-key evil-motion-state-map "j" 'evil-next-visual-line)
+  (define-key evil-motion-state-map "k" 'evil-previous-visual-line)
+
+  (add-hook 'text-mode-hook 'spacemacs/toggle-truncate-lines-off)
+  (add-hook 'text-mode-hook 'visual-fill-column-mode)
+  (add-hook 'text-mode-hook 'wally/text-mode-set-line-width)
+
+  ;; tail
+  (display-time-mode 1)
   )
-
-
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.

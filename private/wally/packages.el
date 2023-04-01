@@ -1,9 +1,7 @@
-(defvar wally-is-mac
-  (equal system-type 'darwin)
-  )
+(defvar wally-is-pc t)
 (defconst wally-os-packages
   (cond
-   (wally-is-mac
+   (wally-is-pc
     '(
       anki-editor
       annotate
