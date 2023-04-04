@@ -1975,4 +1975,66 @@ e.g.
             (if (org-entry-get nil "HABIT")
                 (wally/pros-weekly-analyse-target date))))))))
 
+(defvar __dir_item__ nil)
+
+(defun wally/dir-get-first-item (dir)
+  (car (sort (f-files dir) 'string-lessp)))
+
+
+(defun wally/dir-get-first-item-at-point ()
+  (let ((dir (wally/org-get-item-filepath))
+        item)
+    (when dir
+      (setq item (wally/dir-get-first-item dir))
+      (if item
+          (f-join dir item)))))
+
+
+(defun wally/dir-browse-images ()
+  (save-window-excursion
+    (async-shell-command (format "gthumb -s %s" (wally/dir-get-first-item-at-point))))
+  )
+(defun wally/org-mark-dir-unique-id-with-fisrt-item ()
+  (let ((item (wally/dir-get-first-item-at-point)))
+    (if item
+        (org-set-property
+         "UNIQ_ID"
+         (s-trim (shell-command-to-string
+                  (format "md5sum %s | awk '{print $1}'" item))))
+      (org-todo "QUIT"))))
+
+(defun wally/org-dir-delete-aborted-item ()
+  (let ((dir (wally/org-get-item-filepath)))
+    (when dir
+      (f-delete dir)
+      (message "delete %s" dir)
+      )))
+
+(defun wally/org-dir-generate-index-page ()
+  (let ((item-dir (wally/org-get-item-filepath))
+        (srv-prefix (org-entry-get nil "SRV_PREFIX" t))
+        (page-dir (wally/org-dir-get-page-dir))
+        (page (format "%s.html" (wally/org-get-heading-no-progress)))
+        )
+    (when (and item-dir page-dir)
+      (setq page (f-join page-dir page))
+      (with-temp-buffer
+        (insert (format "<html> <body> %s </body> </html>"
+                        (s-join " " (mapcar
+                                     (lambda (filename) (format "<li><img src=\"%s/%s/%s\"/></li>"
+                                                                srv-prefix (f-base item-dir) (f-filename filename)))
+                                     (f-files item-dir)))))
+        (write-region (point-min) (point-max) page)
+        page))))
+
+(defun wally/org-dir-get-page-dir ()
+  (let ((page-dir (org-entry-get nil "PAGE_DIR" t)))
+    (if (not (f-absolute-p page-dir))
+        (setq page-dir (expand-file-name (f-join default-directory page-dir))))))
+
+
+(defun wally/org-dir-get-page-url ()
+  (format "%s/%s.html" (org-entry-get nil "PAGE_PREFIX" t) (wally/org-get-heading-no-progress)))
+
+
 (provide 'wally-org)
