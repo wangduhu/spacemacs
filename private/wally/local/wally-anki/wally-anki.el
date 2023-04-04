@@ -146,7 +146,7 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
         (db-keys (org-entry-get nil "DB_KEYS" t))
         (formatter (org-entry-get nil "FORMATTER" t))
         (is-image (org-entry-get nil "IMAGE" t))
-        imge-url
+        image-url
         value
         db-kvs)
     (if (not deck)
