@@ -116,12 +116,13 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
         filepath)
     (if (not parent-dir)
         (message "no property: PARENT_DIR")
+      (if (not (f-absolute-p parent-dir))
+          (setq parent-dir (expand-file-name (f-join default-directory parent-dir))))
       (if (not filename)
-          (message "no property: FIALENAME")
-        (setq filepath (f-join parent-dir filename))
-        (if (not (f-exists-p filepath))
-            (message "no such file: %s" filepath)
-          filepath)))))
+          (setq filename (wally/org-get-heading-no-progress)))
+      (setq filepath (f-join parent-dir filename))
+      (if (f-exists-p filepath)
+          filepath))))
 
 (defun wally/org-get-heading-content ()
   (let (content)
@@ -146,7 +147,9 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
         (db-keys (org-entry-get nil "DB_KEYS" t))
         (formatter (org-entry-get nil "FORMATTER" t))
         (is-image (org-entry-get nil "IMAGE" t))
+        (has-page (org-entry-get nil "PAGE" t))
         image-url
+        page-url
         value
         db-kvs)
     (if (not deck)
@@ -157,6 +160,8 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
             (image-srv "http://localhost:7001/img"))
         (if (and image-path srv-prefix)
             (setq image-url (s-join "/" (list image-srv srv-prefix (f-filename image-path)))))))
+    (when has-page
+      (setq page-url (wally/org-dir-get-page-url)))
     (when formatter
       (setq formatter (intern formatter))
       (setq title (apply formatter (list title))))
@@ -171,6 +176,8 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
         (insert (format "* ITEM\n** pros\n%s\n" title))
         (if image-url
             (insert (format "\n#+HTML: <img src=\"%s\"/>\n" image-url)))
+        (if page-url
+            (insert (format "\n#+HTML:<a href=\"%s\"/>\n" page-url)))
         (dolist (kv db-kvs)
           (insert (format "\n%s:%s\n" (car kv) (cdr kv))))
         (insert (format "\n%s\n" content))
