@@ -173,7 +173,7 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
       (erase-buffer)
       (org-mode)
       (save-excursion
-        (insert (format "* ITEM\n** pros\n%s\n" title))
+        (insert (format "* ITEM\n** pros\n =%s=\n" title))
         (if image-url
             (insert (format "\n#+HTML: <img src=\"%s\"/>\n" image-url)))
         (if page-url
