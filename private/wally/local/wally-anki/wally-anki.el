@@ -156,10 +156,13 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
         (anki-id (org-entry-get nil "ANKI_NOTE_ID"))
         (anki-snippet (org-entry-get nil "ANKI_SNIPPET" t))
         (anki-snippet-keys (org-entry-get nil "ANKI_SNIPPET_KEYS" t))
+        (org-use-tag-inheritance t)
+        tags
         value
         )
     (if (not (and deck anki-snippet anki-snippet-keys))
         (error "no deck/snippet/keys specified "))
+    (setq tags (org-get-tags))
     (setq wally-yas-args nil)
     (dolist (key (s-split " " anki-snippet-keys))
       (setq value (org-entry-get nil key t))
@@ -181,6 +184,8 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
       (org-set-property "ANKI_NOTE_TYPE" "Note")
       (if anki-id
           (org-set-property "ANKI_NOTE_ID" anki-id))
+      (if tags
+          (org-set-property "ANKI_TAGS" (s-join " " tags)))
       (anki-editor-mode t)
       (anki-editor-push-notes)
       (setq anki-id (org-entry-get nil "ANKI_NOTE_ID" t)))
