@@ -1,6 +1,7 @@
-(defconst wally-anki-db (expand-file-name "~/Wally/data/db/anki.sqlite3"))
+(defvar wally-anki-db (expand-file-name "~/Wally/data/db/anki.sqlite3"))
 (defconst wally-tmp-anki-db (concat wally-anki-db ".snap"))
 (defconst wally-anki-dir (expand-file-name "~/Wally/data/card"))
+(setq wally-anki-db (expand-file-name "~/Wally/data/db/veil.anki.sqlite3"))
 
 (defvar wally-anki-epc nil)
 (defvar wally-anki-epc-srv (expand-file-name "~/Project/empyc/srv/anki/epcsrv.py"))
@@ -115,6 +116,8 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
 (defun wally/org-get-item-filepath ()
   (let ((parent-dir (org-entry-get nil "PARENT_DIR" t))
         (filename (org-entry-get nil "FILENAME"))
+        (title (wally/org-get-heading-no-progress))
+        (suffix (org-entry-get nil "FILE_SUFFIX" t))
         filepath)
     (if (not parent-dir)
         (message "no property: PARENT_DIR")
@@ -122,6 +125,8 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
           (setq parent-dir (expand-file-name (f-join default-directory parent-dir))))
       (if (not filename)
           (setq filename (wally/org-get-heading-no-progress)))
+      (if suffix
+          (setq filename (format "%s.%s" filename suffix)))
       (setq filepath (f-join parent-dir filename))
       (if (f-exists-p filepath)
           filepath))))
@@ -149,7 +154,9 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
         (db-keys (org-entry-get nil "DB_KEYS" t))
         (formatter (org-entry-get nil "FORMATTER" t))
         (is-image (org-entry-get nil "IMAGE" t))
+        (is-video (org-entry-get nil "VIDEO" t))
         (has-page (org-entry-get nil "PAGE" t))
+        (link (org-entry-get nil "LINK"))
         image-url
         page-url
         value
