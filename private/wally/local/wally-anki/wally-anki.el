@@ -143,66 +143,50 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
       (setq content (buffer-substring-no-properties (line-end-position) (point-max))))
     content))
 
+(defvar wally-yas-args nil)
+
 (defun wally/anki-export-simple-note ()
   "从org文件中导出简单卡片，内容只有标题"
   (interactive)
   (let ((card-buffer "*anki-card*")
         (title (wally/org-get-heading-no-progress))
         (content (wally/org-get-heading-content))
+        (formatter (org-entry-get nil "FORMATTER" t))
         (deck (org-entry-get nil "ANKI_DECK" t))
         (anki-id (org-entry-get nil "ANKI_NOTE_ID"))
-        (db-keys (org-entry-get nil "DB_KEYS" t))
-        (formatter (org-entry-get nil "FORMATTER" t))
-        (is-image (org-entry-get nil "IMAGE" t))
-        (is-video (org-entry-get nil "VIDEO" t))
-        (has-page (org-entry-get nil "PAGE" t))
-        (link (org-entry-get nil "LINK"))
-        image-url
-        page-url
+        (anki-snippet (org-entry-get nil "ANKI_SNIPPET" t))
+        (anki-snippet-keys (org-entry-get nil "ANKI_SNIPPET_KEYS" t))
         value
-        db-kvs)
-    (if (not deck)
-        (error "no deck specified"))
-    (when is-image
-      (let ((image-path (wally/org-get-item-filepath))
-            (srv-prefix (org-entry-get nil "SRV_PREFIX" t))
-            (image-srv "http://localhost:7001/img"))
-        (if (and image-path srv-prefix)
-            (setq image-url (s-join "/" (list image-srv srv-prefix (f-filename image-path)))))))
-    (when has-page
-      (setq page-url (wally/org-dir-get-page-url)))
+        )
+    (if (not (and deck anki-snippet anki-snippet-keys))
+        (error "no deck/snippet/keys specified "))
+    (setq wally-yas-args nil)
+    (dolist (key (s-split " " anki-snippet-keys))
+      (setq value (org-entry-get nil key t))
+      (message "%s:%s" key value)
+      (if (not value)
+          (error "property <%s> not set" key))
+      (add-to-list 'wally-yas-args value))
+    (setq wally-yas-args (reverse wally-yas-args))
     (when formatter
       (setq formatter (intern formatter))
       (setq title (apply formatter (list title))))
-    (dolist (key (s-split " " db-keys))
-      (setq value (org-entry-get nil key))
-      (if (and value (not (equal "NA" value)))
-          (add-to-list 'db-kvs (cons key value))))
     (with-current-buffer card-buffer
       (erase-buffer)
       (org-mode)
       (save-excursion
-        (insert (format "* ITEM\n** pros\n =%s=\n" title))
-        (if image-url
-            (insert (format "\n#+HTML: <img src=\"%s\"/>\n" image-url)))
-        (if page-url
-            (insert (format "\n#+HTML:<a href=\"%s\"/>\n" page-url)))
-        (dolist (kv db-kvs)
-          (insert (format "\n%s:%s\n" (car kv) (cdr kv))))
-        (insert (format "\n%s\n" content))
-        (insert "** cons"))
+        (insert anki-snippet)
+        (yas-expand))
       (org-set-property "ANKI_DECK" deck)
       (org-set-property "ANKI_NOTE_TYPE" "Note")
-      (anki-editor-mode t)
       (if anki-id
           (org-set-property "ANKI_NOTE_ID" anki-id))
+      (anki-editor-mode t)
       (anki-editor-push-notes)
-      (if (not anki-id)
-          (setq anki-id (org-entry-get nil "ANKI_NOTE_ID"))))
-    (if (not anki-id)
-        (message "fail to export card: %s" title)
+      (setq anki-id (org-entry-get nil "ANKI_NOTE_ID" t)))
+    (when anki-id
       (org-set-property "ANKI_NOTE_ID" anki-id)
-      (message "anki card id: %s" anki-id))))
+      (message "export to card: %s" anki-id))))
 
 (defun wally/format-lines (content)
   (with-temp-buffer
