@@ -1,7 +1,7 @@
 (defvar wally-anki-db (expand-file-name "~/Wally/data/db/anki.sqlite3"))
 (defconst wally-tmp-anki-db (concat wally-anki-db ".snap"))
 (defconst wally-anki-dir (expand-file-name "~/Wally/data/card"))
-(setq wally-anki-db (expand-file-name "~/Wally/data/db/veil.anki.sqlite3"))
+;; (setq wally-anki-db (expand-file-name "~/Wally/data/db/veil.anki.sqlite3"))
 
 (defvar wally-anki-epc nil)
 (defvar wally-anki-epc-srv (expand-file-name "~/Project/empyc/srv/anki/epcsrv.py"))
@@ -29,6 +29,11 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
   "判断指定title的anki note是否已存在于数据库中，存在返回note id，否则返回nil"
   (wally/with-tmp-anki-db t
     (epc:call-sync wally-anki-epc 'query_note (list title))))
+
+(defun wally/anki-get-note (id)
+  "判断指定title的anki note是否已存在于数据库中，存在返回note id，否则返回nil"
+  (wally/with-tmp-anki-db t
+    (epc:call-sync wally-anki-epc 'get_note (list id))))
 
 
 (defun wally/anki-get-exported-card ()
@@ -212,6 +217,71 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
     (setq iid (wally/anki-is-note-existed (substring-no-properties title)))
     (if iid
         (org-set-property "ANKI_NOTE_ID" (format "%d" iid)))))
+
+(defun wally/anki-tag-trigger-cover (content)
+  (let ((pattern "img src=\"\\(.+\\)\">")
+        img)
+    (unless (org-entry-get nil "COVER")
+      (when (string-match  pattern content)
+        (setq img (match-string 1 content))
+        (wally/anki-copy-media img)
+        (org-set-property "COVER" (format "anki/%s" img))))))
+
+(defun wally/anki-tag-trigger-link (content)
+  (let ((douban-pattern "\\(https:..[a-z]+.douban.com.subject.[0-9]+.\\)")
+        link)
+    (cond
+     ((string-match douban-pattern content) (org-set-property "DOUBAN" (match-string 1 content))))))
+
+(defun wally/anki-tag-trigger-act (tag content)
+  (let (name func)
+    (message "functional tag %s" tag)
+    (setq tag (substring tag 1)
+          name (format "wally/anki-tag-trigger-%s" tag)
+          func (intern name))
+    (if (fboundp func)
+        (apply func (list content)))))
+
+(cl-defun wally/anki-sync-meta-data ()
+  (interactive)
+  (let ((card-id (org-entry-get nil "ANKI_NOTE_ID"))
+        note
+        tags
+        flags
+        content
+        )
+    (unless card-id
+      (message "not an Anki card")
+      (cl-return-from wally/anki-sync-meta-data))
+    (setq card-id (string-to-number card-id))
+    (setq note (wally/anki-get-note card-id)
+          tags (s-trim (nth 0 note))
+          flags (nth 1 note)
+          content (nth 2 note))
+    (message tags)
+    (unless (s-equals-p tags "")
+      (dolist (tag (s-split " " tags))
+        (if (s-starts-with-p "_" tag)
+            (wally/anki-tag-trigger-act tag content)
+          (org-set-tags (append (org-get-tags) (list tag))))))))
+
+(cl-defun wally/anki-copy-media (filename &optional user)
+  (let (anki-dir
+        src-file
+        (dst-file (f-join (expand-file-name "~/Wally/data/assets/anki") filename))
+        (username user-login-name))
+    (if user
+        (setq username user))
+    (if (equal system-type 'darwin)
+        (setq anki-dir (expand-file-name "~/Library/Application Support/Anki2"))
+      (setq anki-dir (expand-file-name "~/.local/share/Anki2")))
+    (setq src-file (f-join anki-dir username "collection.media" filename))
+    (unless (f-exists-p src-file)
+      (message "%s not exists!" src-file)
+      (cl-return-from wally/anki-copy-media))
+    (unless (f-exists-p dst-file)
+      (f-copy src-file dst-file)
+      (message "copy %s to %s" src-file dst-file))))
 
 
 ;; @DEPRECATED
