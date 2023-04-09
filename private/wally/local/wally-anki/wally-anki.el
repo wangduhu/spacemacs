@@ -145,7 +145,7 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
 
 (defvar wally-yas-args nil)
 
-(defun wally/anki-export-simple-note ()
+(cl-defun wally/anki-export-simple-note ()
   "从org文件中导出简单卡片，内容只有标题"
   (interactive)
   (let ((card-buffer "*anki-card*")
@@ -156,12 +156,16 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
         (anki-id (org-entry-get nil "ANKI_NOTE_ID"))
         (anki-snippet (org-entry-get nil "ANKI_SNIPPET" t))
         (anki-snippet-keys (org-entry-get nil "ANKI_SNIPPET_KEYS" t))
+        (update-existed (org-entry-get nil "ANKI_FORCE_UPDATE" t))
         (org-use-tag-inheritance t)
         tags
         value
         )
     (if (not (and deck anki-snippet anki-snippet-keys))
         (error "no deck/snippet/keys specified "))
+    (when (and anki-id (not update-existed))
+      (message "skip existed card: %s" anki-id)
+      (cl-return-from wally/anki-export-simple-note))
     (setq tags (org-get-tags))
     (setq wally-yas-args nil)
     (dolist (key (s-split " " anki-snippet-keys))
