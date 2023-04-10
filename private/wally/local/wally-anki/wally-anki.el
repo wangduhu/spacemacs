@@ -233,6 +233,24 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
     (cond
      ((string-match douban-pattern content) (org-set-property "DOUBAN" (match-string 1 content))))))
 
+(defun wally/anki-tag-trigger-level_i (content)
+  (org-set-property "_LEVEL" "I"))
+
+(defun wally/anki-tag-trigger-level_ii (content)
+  (org-set-property "_LEVEL" "II"))
+
+(defun wally/anki-tag-trigger-level_iii (content)
+  (org-set-property "_LEVEL" "III"))
+
+(defun wally/anki-tag-trigger-level_x (content)
+  (org-set-property "_LEVEL" "X"))
+
+(defun wally/anki-tag-trigger-notfoud (content)
+  (org-todo "QUIT"))
+
+(defun wally/anki-tag-trigger-rm (content)
+  (org-todo "QUIT"))
+
 (defun wally/anki-tag-trigger-act (tag content)
   (let (name func)
     (message "functional tag %s" tag)
