@@ -511,18 +511,10 @@ the calculated number of days."
 
 (defun wally/org-count-days()
   (interactive)
-  (let ((arch-note (f-join wally-gtd-dir "pros.org"))
-        (note-id "fe289648-6494-47e2-a4a5-404431e333f2")
-        (first-day (format "%s, 01, 01" (format-time-string "%Y" (current-time))))
+  (let ((first-day (format "%s, 01, 01" (format-time-string "%Y" (current-time))))
         (today (format-time-string "%Y, %m, %d" (current-time))) delta percentage)
     (setq delta (+ 1 (string-to-number (calc-count-days first-day today))) percentage (/ delta 365.0))
-    (find-file-noselect arch-note)
-    (with-current-buffer (get-file-buffer arch-note)
-      (org-id-goto note-id)
-      (replace-regexp "[0-9]+/365" (format "%d/365" delta)
-                      nil (line-beginning-position) (line-end-position))
-      (save-buffer))
-    ))
+    (message "%s" delta)))
 
 
 

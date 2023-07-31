@@ -116,7 +116,6 @@
   "`" 'wally/tmp
 
   ";Pc" 'wally/org-pomodoro-contine-current-task
-  ";Vd" 'wally/video-download
   ";Vu" 'wally/video-update-info
   ";Vv" 'wally/evil-add-new-video
   ";aE" 'wally/ann-export-source-list
@@ -146,7 +145,8 @@
   ";oe" 'wally/org-import-evernote
   ";oh" 'wally/org-yank-html-as-orgmode
   ";ol" 'wally/copyq-orglink
-  ";or" 'wally/org-search-reference
+  ";or" 'wally//org-random-subheading
+  ";oR" 'wally/org-search-reference
   ";os" 'wally/org-sort-entries
   ";ot" 'org-tags-view
   ";pa" 'wally/pros-init
@@ -156,6 +156,11 @@
   ";pu" 'wally/pros-update-datetime
   ";rs" 'wally/edit-add-blank-line-for-region
   ";vb" 'wally/video-import-bilibi
+  ";vo" 'wally/video-open-at-piont
+  ;; ";vu" 'wally/video-update-info-at-piont
+  ";vu" 'wally/video-update-meta
+  ";va" 'wally/video-fetch-new-item
+  ";vd" 'wally/video-download-at-point
   )
 
 

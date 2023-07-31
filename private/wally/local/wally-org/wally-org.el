@@ -294,7 +294,7 @@
         (setq key (s-split ":" key)
               alias (car (cdr key))
               key (car key))
-          )
+        )
       (setq record (emacsql conn [:select $i1 :from $i2 :where (= $i3 $r4)]
                             (make-symbol key) (make-symbol db-tbl) (make-symbol db-id-key) iid))
       (setq value "")
@@ -323,7 +323,7 @@
 (defun wally/db-retrive-all-by-main-key (conn table key)
   (let (records items)
     (setq records (emacsql conn [:select $i1 :from $i2]
-                         (make-symbol key) (make-symbol table)))
+                           (make-symbol key) (make-symbol table)))
     (dolist (rec records)
       (add-to-list 'items (symbol-name (car rec))))
     items))
@@ -688,16 +688,16 @@
   (interactive "p")
   (let* ((id (org-id-get-create))
          (lid (downcase id))
-        content
-        beg
-        end
-        title
-        tags
-        (level 0)
-        roam-note
-        card-note
-        (origin-buffer (current-buffer))
-        )
+         content
+         beg
+         end
+         title
+         tags
+         (level 0)
+         roam-note
+         card-note
+         (origin-buffer (current-buffer))
+         )
     (org-mark-subtree)
     (org-set-property "LID" lid)
     (setq beg (region-beginning)
@@ -1306,35 +1306,99 @@
 (setq wally-video-upper-limit 100000000) ; 100M
 (setq wally-video-root "~/Video/collections")
 
-(defun wally/video-download()
-  (interactive)
-  (find-file wally-video-note)
-  (org-map-entries '(lambda ()
-                      (let ((title (org-get-heading))
-                            (url (org-entry-get nil "URL"))
-                            (size (string-to-number (org-entry-get nil "SIZE")))
-                            (filename (org-entry-get nil "FILENAME")) filepath)
-                        (setq filepath (f-join wally-video-root filename))
-                        (if (f-exists-p (format "%s.mp4" filepath))
-                            (message "video <%s> already exists." filepath)
-                          (if (> size wally-video-upper-limit)
-                              (message "skip big video <%s>" title)
-                            (message "downloading video <%s>" title)
-                            (async-shell-command (format "you-get %s -O %s" url filepath))))))
-                   "LEVEL=2"))
 
-(defun wally/video-update-info()
+(defun wally/org-get-parent-dir ()
+  (f-join
+   (org-entry-get nil "ROOT_DIR" t)
+   (wally/org-get-heading-no-progress))
+  )
+
+(defun wally/video-get-file-path ()
+  (f-join
+   (wally/org-get-parent-dir)
+   (org-entry-get nil "FILENAME")))
+
+(defun wally/org-media-visit-parent-dir ()
   (interactive)
-  (find-file wally-video-note)
-  (goto-char (point-min))
-  (org-map-entries '(lambda ()
-                      (let ((title (org-get-heading))
-                            (url (org-entry-get nil "URL"))
-                            (size (org-entry-get nil "SIZE")))
-                        (if (not size)
-                            (progn (message "updating info for <%s>" title)
-                                   (setq size (wally/video-you-get-video-info url))
-                                   (org-set-property "SIZE" size))))) "LEVEL=2"))
+  (find-file (wally/org-get-parent-dir)))
+
+
+(defmacro wally/org-save-excursion (body)
+  )
+
+
+(defun wally/video-open-at-piont ()
+  (interactive)
+  (save-excursion
+    (if (not (org-at-heading-p))
+        (org-up-element))
+    (let* ((file-path (wally/video-get-file-path))
+           (default-directory (f-parent file-path))
+           (today (format-time-string "%Y%m%d"))
+           (last-view (org-entry-get nil "LAST_VIEW")))
+      (if (not last-view)
+          (setq last-view today)
+        (setq last-view (format "%s %s" today last-view)))
+      (org-set-property "LAST_VIEW" last-view)
+      (mpv-play file-path))))
+
+
+(defun wally/video-download-at-point()
+  (interactive)
+  (let* ((uri (org-entry-get nil "SOURCE_URI"))
+         (parent-dir (wally/org-get-parent-dir))
+         (default-directory parent-dir)
+         (filename (format "%s.mp4" (wally/org-get-heading-no-progress)))
+         (filepath (f-join parent-dir filename)))
+    (unless (f-exists-p parent-dir)
+      (f-mkdir parent-dir))
+    (org-set-property "FILENAME" filename)
+    (if (f-exists-p filepath)
+        (message "video <%s> already exists." filepath)
+      (message "downloading video <%s>" filename)
+      (save-window-excursion
+        (async-shell-command (format "youtube-dl '%s' -o %s" uri filename))))))
+
+(defun wally/video-fetch-new-item()
+  (interactive)
+  (let ((src-file (org-entry-get nil "SOURCE_URI"))
+        (root-dir (org-entry-get nil "ROOT_DIR" t))
+        (parent-dir (wally/org-get-heading-no-progress))
+        filename)
+    (setq filename (format "%s.%s" parent-dir (f-ext src-file))
+          parent-dir (f-join root-dir parent-dir))
+    (if (not (f-exists-p parent-dir))
+        (f-mkdir parent-dir))
+    (f-move src-file (f-join parent-dir filename))
+    (org-set-property "FILENAME" filename)
+    (wally/video-update-meta)))
+
+(defun wally/video-collect-screenshots ()
+  (interactive)
+  (let ((parent-dir (wally/org-get-parent-dir))
+        (src-img-pattern "\\[\\[\\(file:\\)?\\(.+mpv\\/\\)\\(.+\\)\\]\\]")
+        end-point
+        src-img-path
+        dst-img-path
+        )
+    (org-mark-subtree)
+    (setq end-point (region-end))
+    (deactivate-mark)
+    (while (re-search-forward src-img-pattern end-point t)
+      (setq src-img-path (concat (match-string 2) (match-string 3))
+            dst-img-path (f-join parent-dir (f-filename src-img-path)))
+      (when (f-exists-p src-img-path)
+        (message "%s %s" src-img-path dst-img-path)
+        (f-move src-img-path dst-img-path)
+        (replace-match (format "[[%s]]" dst-img-path))))))
+
+(defun wally/org-map/video-collect-screenshots ()
+  (interactive)
+  (org-map-entries 'wally/video-collect-screenshots
+                   "ADD_DATE>0"
+                   'tree
+                   )
+  )
 
 (defun wally/video-import-bilibi(page)
   (interactive "Fpath to page: ")
@@ -1344,15 +1408,6 @@
       (if (not (member wally-video-url existing-urls))
           (progn (message "add video <%s>" wally-video-title)
                  (wally/video-add-item))))))
-
-(defun wally/video-add-item()
-  (setq wally-video-filename (s-trim (shell-command-to-string "mktemp -u XXXXXXXX")))
-  (find-file wally-video-note)
-  (goto-char (point-min))
-  (re-search-forward "^\\*\\*" nil t 1)
-  (beginning-of-line)
-  (insert (format "%s" "video-template"))
-  (yas-expand))
 
 (defun wally/video-parse-bilibili-favorite-page(filepath)
   (let* ((root (with-temp-buffer (insert-file-contents filepath)
@@ -1373,9 +1428,9 @@
                                           (add-to-list 'urls (org-entry-get nil "URL"))) "LEVEL=2"))
     urls))
 
-(defun wally/video-you-get-video-info(url)
+(defun wally/video-you-get-video-info(file-path)
   (let (size)
-    (with-temp-buffer (shell-command (format "you-get -i %s" url) t)
+    (with-temp-buffer (shell-command (format "you-get -i %s" file-path) t)
                       ;; (message "%s" (buffer-string))
                       (goto-char (point-min))
                       (re-search-forward "\\([0-9]+\\) bytes" nil t 1)
@@ -1424,35 +1479,22 @@
         (message "deleting at %d" start)
         (delete-region start end)))))
 
-(defun wally/evil-meta ()
+(defun wally/video-update-meta ()
   "add meta info of current item"
   (interactive)
-  (let ((filepath (org-element-property :path (org-element-context)))
-        info
-        (artist (org-entry-get nil "ARTIST"))
-        (rate (org-entry-get nil "RATE"))
-        (area (org-entry-get nil "AREA"))
-        (desc (org-entry-get nil "DESC"))
-        (designation (org-entry-get nil "DESIGNATION"))
-        (producer (org-entry-get nil "PRODUCER"))
-        (level (org-entry-get nil "XLEVEL"))
-        )
-    (if (not (f-exists-p filepath))
-        (error "file %s does not exist." filepath))
-    (setq info (wally/video-get-info filepath))
-    (org-set-property "DURATION" (gethash "duration" info))
-    (org-set-property "SIZE" (gethash "size" info))
-    (org-set-property "CHECKSUM" (format "%s" (gethash "checksum" info)))
-
-    (org-set-property "RATE" (if rate rate 0))
-    (org-set-property "ARTIST" (if artist artist "NA") )
-    (org-set-property "AREA" (if area area "NA"))
-    (org-set-property "DESC" (if desc desc "NA"))
-    (org-set-property "DESIGNATION" (if designation designation "NA"))
-    (org-set-property "PRODUCER" (if producer producer "NA"))
-    (org-set-property "XLEVEL" (if level level "X"))
-    )
-  )
+  (save-excursion
+    (if (not (org-at-heading-p))
+        (org-up-element))
+    (let ((filepath (wally/video-get-file-path))
+          info
+          )
+      (if (not (f-exists-p filepath))
+          (error "file %s does not exist." filepath))
+      (setq info (wally/video-get-info filepath))
+      (org-set-property "DURATION" (gethash "duration" info))
+      (org-set-property "SIZE" (gethash "size" info))
+      (org-set-property "CHECKSUM" (format "%s" (gethash "checksum" info)))
+      (wally/org-complete-properties))))
 
 
 (defun wally/evil-screenshot ()
@@ -1534,21 +1576,22 @@
   (if (not (org-at-heading-p))
       (error "not a org heading"))
   (let* ((heading  (nth 4 (org-heading-components)))
-        (pattern "\\(.+\\) +:\\$\\(.+\\):\\$\\(.+\\):")
-        (date (decode-time (org-get-scheduled-time nil)))
-        (value (org-entry-get nil "VALUE"))
-        dest
-        src
-        dst
-        first-account
-        second-account
-        (alias (make-hash-table :test 'equal))
-        snippet
-        (ledger (f-join wally-journal-dir "private" "account.ledger.gpg"))
-        )
+         (pattern "\\(.+\\) +:\\$\\(.+\\):\\$\\(.+\\):")
+         (date (decode-time (org-get-scheduled-time nil)))
+         (value (org-entry-get nil "VALUE"))
+         dest
+         src
+         dst
+         first-account
+         second-account
+         (alias (make-hash-table :test 'equal))
+         snippet
+         (ledger (f-join wally-journal-dir "private" "account.ledger.gpg"))
+         )
     (dolist (pair (list '("weixin" . "Assets:Checking:WEIXIN")
                         '("zhaohang" . "Assets:Checking:CMB")
                         '("yuebao" . "Assets:Checking:ALIPAY")
+                        '("mw" . "Assets:Checking:MW")
                         '("zhifubao" . "Assets:Checking:ALIPAY")
                         '("gonghang" . "Assets:Checking:ICBC")
                         '("cash" . "Assets:Cash:CASH")
@@ -1559,10 +1602,12 @@
                         '("salary" . "Income:Salary")
                         '("gongjijin" . "Income:Gongjijin")
                         '("subway" . "Expense:Travelling:PublicTransport")
+                        '("banche" . "Expense:Travelling:PublicTransport")
                         '("waterelectricity" . "Expense:Shelter:WaterElectricity")
                         '("@" . "Expense:Socializing:Love")
                         '("julie" . "Creditors:Friends:Julie")
                         '("QuXiao" . "Liabilities:Friends:QuXiao")
+                        '("wangjun" . "Creditor:Friends:WangJun")
                         '("clothes" . "Expense:Clothing:Clothes")
                         '("clothing" . "Expense:Clothing:Clothes")
                         '("mobile" . "Expense:Communication:CallCharge")
@@ -1577,8 +1622,10 @@
                         '("railway" . "Expense:Travelling:Railway")
                         '("beijingbank" . "Assets:Checking:BEIJINGBANK")
                         '("beijingcard" . "Liabilities:CreditCard:BEIJINGBANK")
+                        '("zhaohangcard" . "Liabilities:CreditCard:ZHAOHANG")
                         '("yibao" . "Income:HealthInsurance")
                         '("invest" . "Income:Investment:Bank")
+                        '("otherincome" . "Income:others")
                         '("brother" . "Liabilities:Family:BROTHER")
                         '("sister" . "Liabilities:Family:SISTER")
                         '("drink" . "Expense:Diet:Drink")
@@ -1591,9 +1638,13 @@
                         '("accommodation" . "Expense:Shelter:Accommodation")
                         '("flight" . "Expense:Travelling:Flight")
                         '("hongbao" . "Income:RedPacket")
+                        '("motor" . "Expense:Travelling:Motor")
                         '("marriage" . "Expense:Socializing:Marriage")
+                        '("furniture" . "Expense:Shelter:House:Furniture")
                         '("gongdai" . "Expense:Shelter:House:FundLoan")
+                        '("zhuangxiu" . "Expense:Shelter:House")
                         '("shangdai" . "Expense:Shelter:House:CommercialLoan")
+                        '("喜礼" . "Income:WeddingWhipRound")
                         '("" . "")
                         ))
       (puthash (car pair) (cdr pair) alias))
@@ -1661,9 +1712,9 @@
   (interactive)
   (let ((func-name (wally/func-get-name-at-point)))
     (when func-name (insert (format "(message \"Enter %s\")" func-name))
-            (indent-for-tab-command)
-            (insert (format "\n(message \"Exit %s\")" func-name))
-            (indent-for-tab-command))))
+          (indent-for-tab-command)
+          (insert (format "\n(message \"Exit %s\")" func-name))
+          (indent-for-tab-command))))
 
 (defun wally/git-auto-save-repos()
   (interactive)
@@ -1777,11 +1828,11 @@
     (find-file dateval-file)
     (goto-char (point-min))
     (setq scores (org-map-entries
-                            '(lambda ()
-                               (let ($score))
-                               (setq $score (org-entry-get nil "SCORE"))
-                               $score)
-                            "LEVEL=2"))
+                  '(lambda ()
+                     (let ($score))
+                     (setq $score (org-entry-get nil "SCORE"))
+                     $score)
+                  "LEVEL=2"))
     (with-temp-buffer
       (dolist (score scores)
         (insert (format "%d %s %.2f\n" loop score 0.7))
@@ -1923,14 +1974,14 @@ e.g.
           (setq done nil)
           (when (and (s-less-p line end-day) (string-greaterp line start-day))
             (if (not limit)
-                  (setq done t)
+                (setq done t)
               (setq value (string-to-number (nth 1 (s-split "," line))))
               (if (> limit 0)
-                    (setq done (>= value limit))
+                  (setq done (>= value limit))
                 (setq done (<= value (- limit)))))
             (when done
-                (message "%s %s %s" line limit value)
-                (setq count (1+ count))))
+              (message "%s %s %s" line limit value)
+              (setq count (1+ count))))
           (forward-line 1))))
     count))
 
