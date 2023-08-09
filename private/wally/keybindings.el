@@ -128,6 +128,7 @@
   ";hn" 'wally/helm-quick-note
   ";hr" 'wally/helm-regexp
   ";ia" 'wally/org-add-new-subheading
+  ";iD" 'wally/org-image-remove-item-at-point
   ";lR" 'leetcode-refresh
   ";lS" 'wally/leetcode-save-current-problem
   ";lc" 'wally/leetcode-start-c-or-cpp
@@ -142,6 +143,7 @@
   ";lu" 'leetcode-submit
   ";ma" 'wally/mindmap-add
   ";mc" 'wally/mindmap-convert
+  ";mo" 'wally/media-open-at-point-by-external-app
   ";oe" 'wally/org-import-evernote
   ";oh" 'wally/org-yank-html-as-orgmode
   ";ol" 'wally/copyq-orglink

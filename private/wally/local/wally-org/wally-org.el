@@ -1254,7 +1254,7 @@
   )
 
 
-(defun wally/media-opan-at-piont (opener)
+(defun wally/media-open-at-piont (opener)
   (save-excursion
     (if (not (org-at-heading-p))
         (org-up-element))
@@ -1267,6 +1267,10 @@
         (setq last-view (format "%s %s" today last-view)))
       (org-set-property "LAST_VIEW" last-view)
       (apply opener (list file-path)))))
+
+(defun wally/media-open-at-point-by-external-app ()
+  (interactive)
+  (wally/media-open-at-piont 'spacemacs//open-in-external-app))
 
 (defvar __image__ nil)
 
@@ -1363,7 +1367,7 @@
 
 (defun wally/video-open-at-piont ()
   (interactive)
-  (wally/media-opan-at-piont 'mpv-play))
+  (wally/media-open-at-piont 'mpv-play))
 
 (defun wally/video-download-at-point()
   (interactive)
@@ -2108,6 +2112,21 @@ e.g.
 
 (defun wally/org-dir-get-page-url ()
   (format "%s/%s.html" (org-entry-get nil "PAGE_PREFIX" t) (wally/org-get-heading-no-progress)))
+
+
+(defvar __pages__ nil)
+
+(defun wally/page-fetch-new-item()
+  (interactive)
+  (let ((src-file (org-entry-get nil "SOURCE_URI"))
+        (root-dir (org-entry-get nil "ROOT_DIR" t))
+        (parent-dir (wally/org-get-heading-no-progress))
+        (filename "index.html"))
+    (setq parent-dir (f-join root-dir parent-dir))
+    (if (not (f-exists-p parent-dir))
+        (f-mkdir parent-dir))
+    (f-move src-file (f-join parent-dir filename))
+    (message "page added")))
 
 
 (provide 'wally-org)
