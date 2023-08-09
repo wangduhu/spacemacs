@@ -1230,6 +1230,46 @@
   (let ((dev (if dev dev "eth0")))
     (format-network-address (car (network-interface-info dev)) t)))
 
+(defvar __media__ nil)
+
+(defun wally/org-get-parent-dir ()
+  (expand-file-name
+   (f-join
+    (org-entry-get nil "ROOT_DIR" t)
+    (wally/org-get-heading-no-progress))
+   )
+  )
+
+(defun wally/org-get-file-path ()
+  (f-join
+   (wally/org-get-parent-dir)
+   (org-entry-get nil "FILENAME")))
+
+(defun wally/org-media-visit-parent-dir ()
+  (interactive)
+  (find-file (wally/org-get-parent-dir)))
+
+
+(defmacro wally/org-save-excursion (body)
+  )
+
+
+(defun wally/media-opan-at-piont (opener)
+  (save-excursion
+    (if (not (org-at-heading-p))
+        (org-up-element))
+    (let* ((file-path (wally/org-get-file-path))
+           (default-directory (f-parent file-path))
+           (today (format-time-string "%Y%m%d"))
+           (last-view (org-entry-get nil "LAST_VIEW")))
+      (if (not last-view)
+          (setq last-view today)
+        (setq last-view (format "%s %s" today last-view)))
+      (org-set-property "LAST_VIEW" last-view)
+      (apply opener (list file-path)))))
+
+(defvar __image__ nil)
+
 (defun wally/image-shrink-current()
   (interactive)
   (let ((line (buffer-substring (line-beginning-position) (line-end-position)))
@@ -1245,6 +1285,19 @@
       (if (not (string-equal system-type "gnu/linux"))
           (expand-file-name "~/Pictures") ; mac
         (expand-file-name "~/Picture")))
+
+(defun wally/org-image-get-file-path()
+  (let ((link (org-element-property :raw-link (org-element-context))))
+    (if (s-starts-with-p "file:" link)
+        (setq link (substring link 5)))
+    link))
+
+(defun wally/org-image-remove-item-at-point ()
+  (interactive)
+  (let ((img (wally/org-image-get-file-path)))
+    (when (f-exists-p img)
+      (message "remove %s" img)
+      (move-file-to-trash img))))
 
 (defun wally/image-download-at-point(root)
   (let ((pattern "\\[\\(.*\\)\\[\\(.+\\)\\]\\]")
@@ -1303,45 +1356,14 @@
       (replace-string "webp" "png" nil (line-beginning-position) (line-end-position))
       (message "replace webp with png"))))
 
+(defvar __video__ nil)
+
 (setq wally-video-upper-limit 100000000) ; 100M
 (setq wally-video-root "~/Video/collections")
 
-
-(defun wally/org-get-parent-dir ()
-  (f-join
-   (org-entry-get nil "ROOT_DIR" t)
-   (wally/org-get-heading-no-progress))
-  )
-
-(defun wally/video-get-file-path ()
-  (f-join
-   (wally/org-get-parent-dir)
-   (org-entry-get nil "FILENAME")))
-
-(defun wally/org-media-visit-parent-dir ()
-  (interactive)
-  (find-file (wally/org-get-parent-dir)))
-
-
-(defmacro wally/org-save-excursion (body)
-  )
-
-
 (defun wally/video-open-at-piont ()
   (interactive)
-  (save-excursion
-    (if (not (org-at-heading-p))
-        (org-up-element))
-    (let* ((file-path (wally/video-get-file-path))
-           (default-directory (f-parent file-path))
-           (today (format-time-string "%Y%m%d"))
-           (last-view (org-entry-get nil "LAST_VIEW")))
-      (if (not last-view)
-          (setq last-view today)
-        (setq last-view (format "%s %s" today last-view)))
-      (org-set-property "LAST_VIEW" last-view)
-      (mpv-play file-path))))
-
+  (wally/media-opan-at-piont 'mpv-play))
 
 (defun wally/video-download-at-point()
   (interactive)
@@ -1485,7 +1507,7 @@
   (save-excursion
     (if (not (org-at-heading-p))
         (org-up-element))
-    (let ((filepath (wally/video-get-file-path))
+    (let ((filepath (wally/org-get-file-path))
           info
           )
       (if (not (f-exists-p filepath))
