@@ -1360,6 +1360,18 @@
       (replace-string "webp" "png" nil (line-beginning-position) (line-end-position))
       (message "replace webp with png"))))
 
+(defun wally/image-collectiong-update-meta-info ()
+  (interactive)
+  (let ((img-dir (wally/org-get-parent-dir))
+        imgs
+         )
+    (dolist (f (f-files img-dir))
+      (setq f (f-filename f))
+      (if (and (not (s-starts-with-p "." f)) (member (downcase (f-ext f)) '("jpg" "jpeg" "png" "tif" "gif")))
+          (add-to-list 'imgs f)))
+    (org-set-property "COUNT" (format "%d" (length imgs)))
+    (org-set-property "FILENAME" (car (reverse imgs)))))
+
 (defvar __video__ nil)
 
 (setq wally-video-upper-limit 100000000) ; 100M
@@ -2127,6 +2139,14 @@ e.g.
         (f-mkdir parent-dir))
     (f-move src-file (f-join parent-dir filename))
     (message "page added")))
+
+(defun wally/page-update-meta-info ()
+  (interactive)
+  (let* ((filepath (wally/org-get-file-path))
+         (html (elquery-read-file filepath))
+         title)
+    (setq title (elquery-full-text (car (elquery-$ "title" html))))
+    (org-set-property "TITLE" title)))
 
 
 (provide 'wally-org)

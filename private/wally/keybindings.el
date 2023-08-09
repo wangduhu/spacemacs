@@ -144,6 +144,7 @@
   ";ma" 'wally/mindmap-add
   ";mc" 'wally/mindmap-convert
   ";mo" 'wally/media-open-at-point-by-external-app
+  ";md" 'wally/org-media-visit-parent-dir
   ";oe" 'wally/org-import-evernote
   ";oh" 'wally/org-yank-html-as-orgmode
   ";ol" 'wally/copyq-orglink
