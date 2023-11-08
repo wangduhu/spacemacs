@@ -711,6 +711,8 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
         wally-db-dir (concat wally-journal-dir "dice/")
         wally-data-dir (concat wally-journal-dir "data/")
         wally-note-file (concat wally-gtd-dir "journal.org"))
+
+  (defvar wally-epc nil)
   )
 
 
@@ -770,7 +772,20 @@ before packages are loaded."
   (setq wally-evil-file-root "/Volumes/Wally/Media/.party/.private")
 
   ;; epc
-  (defvar wally-habit-epc (epc:start-epc "python3.9" (list (expand-file-name "~/Project/empyc/srv/habit/epcsrv.py"))))
+  (defun wally/init-epc-srv ()
+    (when wally-epc
+      (epc:stop-epc wally-epc)
+      (setq wally-epc nil))
+    (setq wally-epc (epc:start-epc "python3.9" (list (expand-file-name "~/Project/empyc/source/epcsrv.py")))))
+
+  (defmacro wally/with-epc (cond &rest body)
+    "建立epc连接
+TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs/elisp-macro.html
+"
+    (declare (indent 1) (debug t))
+    (wally/init-epc-srv)
+    `(if ,cond
+         (progn ,@body)))
 
   (eval-after-load "dired-aux"
     '(add-to-list 'dired-compress-file-suffixes

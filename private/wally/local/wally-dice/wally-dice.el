@@ -1,40 +1,18 @@
-(defconst wally-dice-db (expand-file-name "~/Wally/data/db/dice.sqlite3"))
-(defvar wally-dice-epc nil)
-(defvar wally-dice-epc-srv (expand-file-name "~/Project/empyc/srv/dice/epcsrv.py"))
-
-
-(defun wally/dice-init-epc-srv ()
-  (when wally-dice-epc
-    (epc:stop-epc wally-dice-epc)
-    (setq wally-dice-epc nil))
-  (setq wally-dice-epc (epc:start-epc "python3.9" (list wally-dice-epc-srv))))
-
-
-(defmacro wally/with-dice-epc (cond &rest body)
-  "建立epc连接
-TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs/elisp-macro.html
-"
-  (declare (indent 1) (debug t))
-  (wally/dice-init-epc-srv)
-  `(if ,cond
-       (progn ,@body)))
-
-
 (defun wally/dice-epc-dice (table count)
-  (epc:call-sync wally-dice-epc 'dice (list table count)))
+  (epc:call-sync wally-epc 'dice_random (list table count)))
 
 
 (defun wally/dice-epc-query(table title)
-  (epc:call-sync wally-dice-epc 'query (list table title)))
+  (epc:call-sync wally-epc 'dice_query (list table title)))
 
 
 (defun wally/dice-epc-rate(table recid rate)
-  (if (epc:call-sync wally-dice-epc 'rate (list table recid rate))
+  (if (epc:call-sync wally-epc 'dice_rate (list table recid rate))
       (message "rate %d on %s<%d>" rate table recid)))
 
 
 (defun wally/dice-epc-add-item(table fields)
-  (if (epc:call-sync wally-dice-epc 'add_item (list table fields))
+  (if (epc:call-sync wally-epc 'dice_append (list table fields))
       (message "add to table<%s>: %s" table fields)))
 
 
@@ -91,7 +69,7 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
 
 (defun wally/dice-items(items)
   (let (table count choice choices)
-    (wally/with-dice-epc t
+    (wally/with-epc t
       (dolist (item items)
         (setq table (car item)
               count (cdr item)

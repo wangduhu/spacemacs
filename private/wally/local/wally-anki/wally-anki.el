@@ -1,39 +1,11 @@
-(defvar wally-anki-db (expand-file-name "~/Wally/data/db/anki.sqlite3"))
-(defconst wally-tmp-anki-db (concat wally-anki-db ".snap"))
-(defconst wally-anki-dir (expand-file-name "~/Wally/data/card"))
-;; (setq wally-anki-db (expand-file-name "~/Wally/data/db/veil.anki.sqlite3"))
-
-(defvar wally-anki-epc nil)
-(defvar wally-anki-epc-srv (expand-file-name "~/Project/empyc/srv/anki/epcsrv.py"))
-
-
-(defun wally/anki-init-conn ()
-  (when wally-anki-epc
-    (epc:stop-epc wally-anki-epc)
-    (setq wally-anki-epc nil))
-  (if (f-exists-p wally-tmp-anki-db)
-      (f-delete wally-tmp-anki-db))
-  (f-copy wally-anki-db wally-tmp-anki-db)
-  (setq wally-anki-epc (epc:start-epc "python3" (list wally-anki-epc-srv))))
-
-(defmacro wally/with-tmp-anki-db (cond &rest body)
-  "复制anki db并建立epc连接
-TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs/elisp-macro.html
-"
-  (declare (indent 1) (debug t))
-  `(if ,cond
-       (progn ,@body)))
-
 
 (defun wally/anki-is-note-existed (title)
   "判断指定title的anki note是否已存在于数据库中，存在返回note id，否则返回nil"
-  (wally/with-tmp-anki-db t
-    (epc:call-sync wally-anki-epc 'query_note (list title))))
+    (epc:call-sync wally-epc 'anki_query_note (list title)))
 
 (defun wally/anki-get-note (id)
   "判断指定title的anki note是否已存在于数据库中，存在返回note id，否则返回nil"
-  (wally/with-tmp-anki-db t
-    (epc:call-sync wally-anki-epc 'get_note (list id))))
+    (epc:call-sync wally-epc 'anki_get_note (list id)))
 
 
 (defun wally/anki-get-exported-card ()
