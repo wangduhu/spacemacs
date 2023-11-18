@@ -1232,22 +1232,22 @@
 
 (defvar __media__ nil)
 
-(defun wally/org-get-parent-dir ()
+(defun wally/org-get-item-dir ()
   (expand-file-name
    (f-join
-    (org-entry-get nil "ROOT_DIR" t)
+    (org-entry-get nil "PARENT_DIR" t)
     (wally/org-get-heading-no-progress))
    )
   )
 
 (defun wally/org-get-file-path ()
   (f-join
-   (wally/org-get-parent-dir)
+   (wally/org-get-item-dir)
    (org-entry-get nil "FILENAME")))
 
 (defun wally/org-media-visit-parent-dir ()
   (interactive)
-  (find-file (wally/org-get-parent-dir)))
+  (find-file (wally/org-get-item-dir)))
 
 
 (defmacro wally/org-save-excursion (body)
@@ -1362,7 +1362,7 @@
 
 (defun wally/image-collectiong-update-meta-info ()
   (interactive)
-  (let ((img-dir (wally/org-get-parent-dir))
+  (let ((img-dir (wally/org-get-item-dir))
         imgs
          )
     (dolist (f (f-files img-dir))
@@ -1384,18 +1384,22 @@
 (defun wally/video-download-at-point()
   (interactive)
   (let* ((uri (org-entry-get nil "SOURCE_URI"))
-         (parent-dir (wally/org-get-parent-dir))
+         (parent-dir (wally/org-get-item-dir))
          (default-directory parent-dir)
          (filename (format "%s.mp4" (wally/org-get-heading-no-progress)))
          (filepath (f-join parent-dir filename)))
     (unless (f-exists-p parent-dir)
       (f-mkdir parent-dir))
     (org-set-property "FILENAME" filename)
+    (message "%s" filepath)
     (if (f-exists-p filepath)
         (message "video <%s> already exists." filepath)
       (message "downloading video <%s>" filename)
-      (save-window-excursion
-        (async-shell-command (format "youtube-dl '%s' -o %s" uri filename))))))
+      (async-shell-command (format "you-get '%s' -O %s --debug" uri (f-base filename)))
+      ;; (save-window-excursion
+      ;;   (async-shell-command (format "youtube-dl '%s' -o %s" uri filename))
+      ;;   (async-shell-command (format "you-get '%s' -O %s --debug" uri filename)))
+      )))
 
 (defun wally/video-fetch-new-item()
   (interactive)
@@ -1413,7 +1417,7 @@
 
 (defun wally/video-collect-screenshots ()
   (interactive)
-  (let ((parent-dir (wally/org-get-parent-dir))
+  (let ((parent-dir (wally/org-get-item-dir))
         (src-img-pattern "\\[\\[\\(file:\\)?\\(.+mpv\\/\\)\\(.+\\)\\]\\]")
         end-point
         src-img-path

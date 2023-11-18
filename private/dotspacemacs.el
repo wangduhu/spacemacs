@@ -215,6 +215,8 @@ This function should only modify configuration layer settings."
                                       quelpa-use-package
                                       pretty-hydra
                                       org-ref
+                                      elquery
+                                      mpv
                                       )
 
    ;; A list of packages that cannot be updated.
