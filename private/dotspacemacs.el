@@ -630,7 +630,9 @@ configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
+  ;; hook
   (add-hook 'kill-buffer-hook 'wally/snap-delete-file-on-close)
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
   ;; gpg
   (setq epa-pinentry-mode 'loopback
@@ -656,29 +658,3 @@ before packages are loaded."
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-  (custom-set-variables
-   ;; custom-set-variables was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   '(safe-local-variable-values
-     '((eval setq org-refile-targets
-             '((wally-note-file :maxlevel . 2)))
-       (org-download-image-dir . "~/Wally/Journal/assets/download")
-       (pangu-spacing-real-insert-separtor)
-       (ssh-deploy-force-on-explicit-save . 1)
-       (ssh-deploy-on-explicit-save . 1)
-       (ssh-deploy-root-remote . "/ssh:wally@192.168.1.2:/home/wally/Wally/Journal/")
-       (ssh-deploy-root-local . "/Users/wally/Wally/Journal/"))))
-  (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   )
-  )

@@ -741,7 +741,6 @@ before packages are loaded."
 
 
   ;; hook
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
   (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2)))
 
   (add-hook 'after-change-major-mode-hook
