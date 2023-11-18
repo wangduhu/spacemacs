@@ -180,7 +180,6 @@ This function should only modify configuration layer settings."
                                                python-sort-imports-on-save t
                                                python-enable-yapf-format-on-save t)
                                        racket restclient
-                                       search-engine
                                        semantic
                                        (shell :variables
                                               shell-default-height 30
@@ -842,34 +841,6 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
   (setq debug-on-error nil)
 
   (setq projectile-indexing-method 'native)
-  (setq search-engine-alist
-        '((google :name "Google" :url "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s")
-          (bing :name "Bing" :url "http://www.bing.com/search?q=%s")
-          (github :name "Github" :url "https://github.com/search?ref=simplesearch&q=%s")
-          (stack-overflow :name "Stack Overflow" :url "https://stackoverflow.com/search?q=%s")
-          (wikipedia :name "Wikipedia" :url "http://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s")
-          ;; (amazon :name "Amazon" :url "http://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%%3Daps&field-keywords=%s")
-          ;; (duck-duck-go :name "Duck Duck Go" :url "https://duckduckgo.com/?q=%s")
-          ;; (google-images :name "Google Images" :url "http://www.google.com/images?hl=en&source=hp&biw=1440&bih=795&gbv=2&aq=f&aqi=&aql=&oq=&q=%s")
-          ;; (google-maps :name "Google Maps" :url "http://maps.google.com/maps?q=%s")
-          ;; (twitter :name "Twitter" :url "https://twitter.com/search?q=%s")
-          ;; (project-gutenberg :name "Project Gutenberg" :url "http://www.gutenberg.org/ebooks/search.html/?format=html&default_prefix=all&sort_order=&query=%s")
-          ;; (youtube :name "YouTube" :url "http://www.youtube.com/results?aq=f&oq=&search_query=%s")
-          ;; (spacemacs-issues :name "Spacemacs Issues" :url "https://github.com/syl20bnr/spacemacs/issues?utf8=%%E2%%9C%%93&q=is%%3Aissue+is%%3Aopen+%s")
-          ;; (spacemacs-pullrequests :name "Spacemacs Pull Requests" :url "https://github.com/syl20bnr/spacemacs/pulls?utf8=%%E2%%9C%%93&q=is%%3Aissue+is%%3Aopen+%s")
-          ;; (wolfram-alpha :name "Wolfram Alpha" :url "http://www.wolframalpha.com/input/?i=%s")
-
-          (cmake :name "CMake" :url "https://cmake.org/cmake/help/v3.0/search.html?q=%s&check_keywords=yes&area=default")
-          (opencv :name "OpenCV" :url "https://docs.opencv.org/master/search/all_d.html?%s")
-          (eudic :name "eudic" :url "https://dict.eudic.net/dicts/en/%s")
-          (youdao :name "youdao" :url "https://www.youdao.com/w/%s")
-          (mdn :name "MDN" :url "https://developer.mozilla.org/zh-CN/search?q=%s")
-          (zhihu :name "zhihu" :url "https://www.zhihu.com/search?&q=%s")
-          (douban :name "douban" :url "https://www.douban.com/search?q=%s")
-          (cpp :name "cpp" :url "http://www.cplusplus.com/search.do?q=%s")
-          (leetcode :name "leetcode" :url "https://leetcode-cn.com/problems/%s/")
-          )
-        )
 
   ;; org-protocol begin
   (org-link-set-parameters

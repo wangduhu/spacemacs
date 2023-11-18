@@ -98,6 +98,7 @@ This function should only modify configuration layer settings."
           osx-right-option-as  'left
           osx-right-control-as 'left
           osx-swap-option-and-command nil)
+     search-engine
      spell-checking
      syntax-checking
      (shell :variables
@@ -632,8 +633,47 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+
+  ;; search-engine
+  (setq search-engine-alist (append search-engine-alist
+                                    '((cmake :name "CMake" :url "https://cmake.org/cmake/help/v3.0/search.html?q=%s&check_keywords=yes&area=default")
+                                      (opencv :name "OpenCV" :url "https://docs.opencv.org/master/search/all_d.html?%s")
+                                      (eudic :name "eudic" :url "https://dict.eudic.net/dicts/en/%s")
+                                      (youdao :name "youdao" :url "https://www.youdao.com/w/%s")
+                                      (mdn :name "MDN" :url "https://developer.mozilla.org/zh-CN/search?q=%s")
+                                      (zhihu :name "zhihu" :url "https://www.zhihu.com/search?&q=%s")
+                                      (douban :name "douban" :url "https://www.douban.com/search?q=%s")
+                                      (cpp :name "cpp" :url "http://www.cplusplus.com/search.do?q=%s")
+                                      (leetcode :name "leetcode" :url "https://leetcode-cn.com/problems/%s/")
+                                      )))
   )
 
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(safe-local-variable-values
+     '((eval setq org-refile-targets
+             '((wally-note-file :maxlevel . 2)))
+       (org-download-image-dir . "~/Wally/Journal/assets/download")
+       (pangu-spacing-real-insert-separtor)
+       (ssh-deploy-force-on-explicit-save . 1)
+       (ssh-deploy-on-explicit-save . 1)
+       (ssh-deploy-root-remote . "/ssh:wally@192.168.1.2:/home/wally/Wally/Journal/")
+       (ssh-deploy-root-local . "/Users/wally/Wally/Journal/"))))
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   )
+  )
