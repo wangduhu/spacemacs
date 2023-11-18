@@ -1,4 +1,33 @@
 
+;; snap
+(defun wally/snap-delete-file-on-close ()
+  "当关闭临时文件时，删除之"
+  (let ((filepath (buffer-file-name)))
+    (when (and filepath (s-contains-p wally-snap-dir filepath))
+      (save-buffer)
+      (f-delete filepath)
+      (message "deleting %s" filepath))))
+
+(defun wally/snap-mirror ()
+  "在临时目录中为当前文件生成一个镜像文件"
+  (interactive)
+  (let* ((src-file (buffer-file-name))
+         (dst-file (f-join wally-snap-dir (f-filename src-file)))
+         (content (buffer-substring (point-min) (point-max))))
+    (when (not (f-exists-p wally-snap-dir))
+      (f-mkdir wally-snap-dir)
+      (message "wally-snap-dir created"))
+    (if (s-ends-with-p ".gpg" dst-file)
+        (setq dst-file (substring dst-file 0 -4)))
+    (when (f-exists-p dst-file)
+      (f-delete dst-file)
+      (message "remove dst-file(%s)" dst-file))
+    (find-file dst-file)
+    (insert content)
+    (save-buffer)))
+
+
+;; ledger
 (defun wally/finance-convert-orgheading-to-ledger-item ()
   (interactive)
   (if (not (org-at-heading-p))
@@ -14,8 +43,7 @@
          second-account
          (alias (make-hash-table :test 'equal))
          snippet
-         (ledger (f-join wally-journal-dir "private" "account.ledger.gpg"))
-         )
+         (ledger (f-join wally-journal-dir "private" "account.ledger.gpg")))
     ;; TODO @REFACTOR 列表不要定义在代码里，改为定义在文件里(可以由org-mode文件管理，导出到临时文件中)
     (dolist (pair (list '("weixin" . "Assets:Checking:WEIXIN")
                         '("zhaohang" . "Assets:Checking:CMB")

@@ -303,40 +303,6 @@
 
 
 ;; snap utils
-(defvar __snap__ nil)
-
-(defconst wally-snap-dir (expand-file-name "~/.snap"))
-
-(defun wally/snap-auto-delete ()
-  (let ((filepath (buffer-file-name)))
-    (when (and filepath (s-equals-p wally-snap-dir (f-dirname filepath)))
-      (save-buffer)
-      (message "deleting %s" filepath)
-      (f-delete filepath))))
-
-(defun wally/snap-mirror ()
-  "create a snap mirror of current file
-TODO
-- [ ] change major-mode automatically
-- [ ] map mirror buffer with current buffer
-"
-  (interactive)
-  (let* ((src-file (buffer-file-name))
-         (dst-file (f-join wally-snap-dir (f-filename src-file)))
-         (content (buffer-substring (point-min) (point-max)))
-         )
-    (when (not (f-exists-p wally-snap-dir))
-      (f-mkdir wally-snap-dir)
-      (message "wally-snap-dir created"))
-    (if (s-ends-with-p ".gpg" dst-file)
-        (setq dst-file (substring dst-file 0 -4)))
-    (when (f-exists-p dst-file)
-      (f-delete dst-file)
-      (message "remove dst-file(%s)" dst-file))
-    (find-file dst-file)
-    (insert content)
-    (save-buffer)
-    ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helm

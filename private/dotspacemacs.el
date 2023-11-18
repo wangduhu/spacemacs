@@ -617,6 +617,8 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
         wally-gtd-dir (concat wally-journal-dir "gtd/")
         wally-data-dir (concat wally-journal-dir "data/")
         wally-note-file (concat wally-gtd-dir "journal.org"))
+
+  (defconst wally-snap-dir (expand-file-name "~/.snap"))
   )
 
 
@@ -634,6 +636,9 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+
+  (add-hook 'kill-buffer-hook 'wally/snap-delete-file-on-close)
+
   ;; gpg
   (setq epa-pinentry-mode 'loopback
         epa-file-select-keys 0
