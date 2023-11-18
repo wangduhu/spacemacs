@@ -4,7 +4,7 @@
   (if (not (org-at-heading-p))
       (error "not a org heading"))
   (let* ((heading  (nth 4 (org-heading-components)))
-         (pattern "\\(.+\\) +:\\$\\(.+\\):\\$\\(.+\\):")
+         (pattern "\\(.+\\) +:\\$\\(.+\\):\\$\\(.+\\):") ; TODO @REFACTOR 看不懂这是啥？
          (date (decode-time (org-get-scheduled-time nil)))
          (value (org-entry-get nil "VALUE"))
          dest
@@ -16,6 +16,7 @@
          snippet
          (ledger (f-join wally-journal-dir "private" "account.ledger.gpg"))
          )
+    ;; TODO @REFACTOR 列表不要定义在代码里，改为定义在文件里(可以由org-mode文件管理，导出到临时文件中)
     (dolist (pair (list '("weixin" . "Assets:Checking:WEIXIN")
                         '("zhaohang" . "Assets:Checking:CMB")
                         '("yuebao" . "Assets:Checking:ALIPAY")
@@ -113,6 +114,7 @@
      (t
       (error "valid but unsupported org-heading"))
      )
+    ;; TODO @REFACTOR 是否可以使用 `ledger-add-transaction'
     (setq snippet (format "\n%4d-%02d-%02d %s\n    %s  %s CNY\n    %s\n" (nth 5 date) (nth 4 date) (nth 3 date) desc
                           first-account value second-account))
     (find-file-noselect ledger)
@@ -120,6 +122,7 @@
       (goto-char (point-max))
       (insert snippet)
       (save-buffer))
+    ;; TODO @REFACTOR ledger文件操作和orgmode文件操作分离，封装成不同函数
     (org-archive-subtree)
     (save-buffer)
     (message "add ledger item: %s(%s)" desc value)))
