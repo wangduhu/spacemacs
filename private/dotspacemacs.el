@@ -85,6 +85,7 @@ This function should only modify configuration layer settings."
               pangu-spacing-real-insert-separtor nil
               chinese-enable-youdao-dict t)
      emacs-lisp
+     finance
      git
      helm
      lsp
