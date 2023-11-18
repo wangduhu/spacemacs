@@ -108,10 +108,6 @@
   "smf" 'fundamental-mode
   "sr" 'sr-speedbar-toggle
   "wj" 'wally@julie
-  "<ESC>" '(lambda()
-             (interactive)
-             (find-file wally-note-file))
-  "<RET>" 'org-clock-goto
   "<tab>" 'spacemacs/alternate-buffer
   "`" 'wally/tmp
 
