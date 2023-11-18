@@ -909,7 +909,6 @@ Handle links like: org-protocol://open-file?file=/foo/ss/subdir/foo.js&line=132"
   (global-pangu-spacing-mode 1)
   (global-undo-tree-mode)
   (evil-set-undo-system 'undo-tree)
-  (epa-file-enable)
   (org-super-agenda-mode 1)
 
   (with-eval-after-load 'org

@@ -633,6 +633,12 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  ;; gpg
+  (setq epa-pinentry-mode 'loopback
+        epa-file-select-keys 0
+        ;; ask encryption password once
+        epa-file-cache-passphrase-for-symmetric-encryption t)
+  (epa-file-enable)
 
   ;; search-engine
   (setq search-engine-alist (append search-engine-alist
