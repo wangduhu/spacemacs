@@ -12,14 +12,14 @@
       emacsql-sqlite
       epc
       highlight-function-calls
-      log4e
+      ;; log4e
       org-dashboard
-      org-media-note
+      ;; org-media-note
       org-noter
       org-randomnote
       org-random-todo
-      org-roam
-      org-roam-ui
+      ;; org-roam
+      ;; org-roam-ui
       simple-httpd
       sr-speedbar
       ssh-deploy
@@ -254,7 +254,7 @@ Each entry is either:
     :requires f
     :after org
     :config
-    (setq org-roam-directory (f-join (f-parent wally-journal-dir) "logseq" "roam")
+    (setq org-roam-directory (f-join wally-journal-dir "roam")
           org-roam-db-location (f-join wally-data-dir "org-roam.db"))
     ))
 

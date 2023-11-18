@@ -128,6 +128,7 @@
   ";hn" 'wally/helm-quick-note
   ";hr" 'wally/helm-regexp
   ";ia" 'wally/org-add-new-subheading
+  ";ij" 'wally/org-item-jump
   ";iD" 'wally/org-image-remove-item-at-point
   ";lR" 'leetcode-refresh
   ";lS" 'wally/leetcode-save-current-problem

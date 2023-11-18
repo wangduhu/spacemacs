@@ -1654,6 +1654,7 @@
                         '("haircut" . "Expense:Clothing:Haircut")
                         '("commodity" . "Expense:Shelter:DailySupplies")
                         '("fang" . "Expense:Shelter:House")
+                        '("baby" . "Expense:ChildCare")
                         '("it" . "Expense:Technique:IT")
                         '("treatment" . "Expense:Health:Treatment")
                         '("medicine" . "Expense:Health:Medicine")
