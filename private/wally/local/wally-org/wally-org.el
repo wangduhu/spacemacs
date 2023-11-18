@@ -331,52 +331,31 @@
 (defconst __org-journal__ nil)
 (defconst __ledger__ nil)
 
-(defun wally/org-journal-format-heading ()
+(defun wally/logseq-normalize ()
   (interactive)
   (let* ((filename (f-base (buffer-file-name)))
          (date (parse-time-string (format "%s 00:00:00" (s-replace "_" "-" filename)))))
-    ;; remove single line with "*"
+    ;; 删除只有`*'的无效行
     (goto-char (point-min))
     (save-excursion
       (flush-lines "^\\*$"))
     ;; degrade top-level headings
     (save-excursion
-      (replace-regexp "^\\* " "** "))
-    ;; insert top heading
-    (insert (format "* %s\n\n" (format-time-string org-journal-date-format (encode-time date))))))
-
-(defun wally/logseq-add-journal (note)
-  (let* ((journal-root "~/Wally/logseq/journals")
-         (note-file (f-join journal-root
-                            (format-time-string "%Y_%m_%d.org"
-                                                (time-add (current-time) (seconds-to-time (* 24 (* 60 60))))))))
-    (find-file-noselect note-file)
-    (with-current-buffer (get-file-buffer note-file)
-      (goto-char (point-min))
-      (insert note)
-      (save-buffer))))
-
-(defun wally/logseq-init-journal ()
-  "按org-journal日期格式初始化次日笔记"
-  (wally/logseq-add-journal
-   (format-time-string "* %A, %B %d %Y"
-                       (time-add (current-time) (seconds-to-time (* 24 (* 60 60)))))))
-
-(defun wally/logseq-normalize ()
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (replace-regexp "\\*\\*\\([0-9:]+\\)\\*\\*" "*\\1*")
-    (goto-char (point-min))
-    (replace-regexp "^\\(\\* .+\\) \\(\\[\\[...assets.+\\(jpg\\|jpeg\\|png\\|webp\\)\\]\\]\\)" "\\1\n\n#+attr_org: :width 600px\n\\2\n")
-    (goto-char (point-min))
-    (replace-regexp "^\\(\\*[0-9\\.]+\\* .+\\)" "* \\1")
-    (goto-char (point-min))
-    (replace-regexp "^\\(\\*\\* \\*?[0-9\\.\\.]+\\*?\\) \\(.+\\)" "\\1\n\n\\2\n")
-    (goto-char (point-min))
-    (replace-regexp "\n\n\n" "\n\n")
-    (goto-char (point-min))
-    (replace-regexp "\\[\\[quick capture\\]\\]" "quick capture")))
+      (replace-regexp "^\\* \\*?\\([0-9.:]+\\)\\*? \\(.+\\)$" "** *\\1*\n\n\\2\n"))
+    (save-excursion
+      (replace-regexp "^\\* \\*?\\([0-9.:]+\\)\\*?$" "** *\\1*"))
+    (save-excursion
+      (replace-regexp "^\\(\\* .+\\) \\(\\[\\[...assets.+\\(jpg\\|jpeg\\|png\\|webp\\)\\]\\]\\)" "\\1\n\n#+attr_org: :width 600px\n\\2\n"))
+    ;; 插入日期一级标题
+    (save-excursion
+      (insert (format "* %s\n\n" (format-time-string org-journal-date-format (encode-time date)))))
+    ;; 删除连续空行
+    (save-excursion
+      (replace-string "\n\n\n" "\n\n"))
+    ;; 如果标题前缺少空行，则补充一个
+    (save-excursion
+      (replace-regexp "\\([^\n]\\)\n\\*" "\\1\n\n*"));
+    ))
 
 (defun wally/org-task-refresh-subitems()
   (interactive)
@@ -735,13 +714,14 @@
           content (buffer-substring-no-properties beg end))
 
     ;; roam note, 加前缀则不导出
-    (when (= arg 4)
-      (setq roam-note (wally/org-roam-export lid title level tags content))
-      (find-file roam-note))
-
-    ;; anki note
-    (setq card-note (wally/anki-export-org-heading id title level tags content))
-    (message "export anki note to <%s>" card-note)))
+    (if (= arg 4)
+      (progn
+        (setq roam-note (wally/org-roam-export lid title level tags content))
+        (find-file roam-note)
+        )
+      ;; anki note
+      (setq card-note (wally/anki-export-org-heading id title level tags content))
+      (message "export anki note to <%s>" card-note))))
 
 (defun wally//org-roam-name-file (title)
   (format "%s-%s.org" (format-time-string "%Y%m%d%H%M%S" (current-time))
