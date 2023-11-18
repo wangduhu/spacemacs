@@ -100,6 +100,7 @@ This function should only modify configuration layer settings."
           osx-right-control-as 'left
           osx-swap-option-and-command nil)
      search-engine
+     semantic
      spell-checking
      syntax-checking
      (shell :variables

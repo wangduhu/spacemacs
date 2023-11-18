@@ -3,7 +3,8 @@
 (defun wally/snap-delete-file-on-close ()
   "当关闭临时文件时，删除之"
   (let ((filepath (buffer-file-name)))
-    (when (and filepath (s-contains-p wally-snap-dir filepath))
+    (when (and filepath
+               (s-contains-p wally-snap-dir filepath))
       (save-buffer)
       (f-delete filepath)
       (message "deleting %s" filepath))))
@@ -12,8 +13,10 @@
   "在临时目录中为当前文件生成一个镜像文件"
   (interactive)
   (let* ((src-file (buffer-file-name))
-         (dst-file (f-join wally-snap-dir (f-filename src-file)))
-         (content (buffer-substring (point-min) (point-max))))
+         (dst-file (f-join wally-snap-dir
+                           (f-filename src-file)))
+         (content (buffer-substring (point-min)
+                                    (point-max))))
     (when (not (f-exists-p wally-snap-dir))
       (f-mkdir wally-snap-dir)
       (message "wally-snap-dir created"))
@@ -32,7 +35,8 @@
   (interactive)
   (if (not (org-at-heading-p))
       (error "not a org heading"))
-  (let* ((heading  (nth 4 (org-heading-components)))
+  (let* ((heading (nth 4
+                       (org-heading-components)))
          (pattern "\\(.+\\) +:\\$\\(.+\\):\\$\\(.+\\):") ; TODO @REFACTOR 看不懂这是啥？
          (date (decode-time (org-get-scheduled-time nil)))
          (value (org-entry-get nil "VALUE"))
@@ -88,8 +92,8 @@
                         '("sister" . "Liabilities:Family:SISTER")
                         '("drink" . "Expense:Diet:Drink")
                         '("health" . "Expense:Health:Health")
-                        '("pet". "Expense:Entertainment:Pet")
-                        '("leisure". "Expense:Entertainment:Leisure")
+                        '("pet" . "Expense:Entertainment:Pet")
+                        '("leisure" . "Expense:Entertainment:Leisure")
                         '("socity" . "Expense:Socializing:Others")
                         '("family" . "Expense:Socializing:Family")
                         '("commissioncharge" . "Expense:Socializing:Others")
@@ -103,48 +107,56 @@
                         '("zhuangxiu" . "Expense:Shelter:House")
                         '("shangdai" . "Expense:Shelter:House:CommercialLoan")
                         '("喜礼" . "Income:WeddingWhipRound")
-                        '("" . "")
-                        ))
-      (puthash (car pair) (cdr pair) alias))
+                        '("" . "")))
+      (puthash (car pair)
+               (cdr pair)
+               alias))
     (if (not (string-match "\\(.+\\) +:\\$\\(.+\\):\\$\\(.+\\):" (format "%s" heading)))
         (error "invalid org heading: %S" heading))
     (setq desc (match-string 1 heading)
-          src (match-string 2 heading)
-          dst (match-string 3 heading))
+          src
+          (match-string 2 heading)
+          dst
+          (match-string 3 heading))
     (setq src (gethash src alias)
-          dst (gethash dst alias))
+          dst
+          (gethash dst alias))
     ;; most cases
-    (setq first-account src
-          second-account dst)
+    (setq first-account src second-account dst)
     (cond
-     ((s-starts-with-p "Expense" src)
-      nil)
+     ((s-starts-with-p "Expense" src) nil)
      ((s-starts-with-p "Expense" dst)
-      (setq first-account dst
-            second-account src))
+      (setq first-account dst second-account src))
      ;; 工资收入等
-     ((and (s-starts-with-p "Assets" src) (s-starts-with-p "Income" dst))
-      nil
-      )
+     ((and (s-starts-with-p "Assets" src)
+           (s-starts-with-p "Income" dst)) nil)
      ;; 转账
-     ((and (s-starts-with-p "Assets" src) (s-starts-with-p "Assets" dst))
+     ((and (s-starts-with-p "Assets" src)
+           (s-starts-with-p "Assets" dst))
       (setq value (concat "-" value)))
      ;; 信用卡还款
-     ((and (s-starts-with-p "Assets" src) (s-starts-with-p "Liabilities" dst))
+     ((and (s-starts-with-p "Assets" src)
+           (s-starts-with-p "Liabilities" dst))
       (setq value (concat "-" value)))
      ;; 信用卡借款
-     ((and (s-starts-with-p "Liabilities" src) (s-starts-with-p "Assets" dst))
+     ((and (s-starts-with-p "Liabilities" src)
+           (s-starts-with-p "Assets" dst))
       (setq value (concat "-" value)))
      ;; 借钱
-     ((and (s-starts-with-p "Assets" src) (s-starts-with-p "Creditors" dst))
+     ((and (s-starts-with-p "Assets" src)
+           (s-starts-with-p "Creditors" dst))
       (setq value (concat "-" value)))
      ;; 不支持的情况
-     (t
-      (error "valid but unsupported org-heading"))
-     )
+     (t (error "valid but unsupported org-heading")))
     ;; TODO @REFACTOR 是否可以使用 `ledger-add-transaction'
-    (setq snippet (format "\n%4d-%02d-%02d %s\n    %s  %s CNY\n    %s\n" (nth 5 date) (nth 4 date) (nth 3 date) desc
-                          first-account value second-account))
+    (setq snippet (format "\n%4d-%02d-%02d %s\n    %s  %s CNY\n    %s\n"
+                          (nth 5 date)
+                          (nth 4 date)
+                          (nth 3 date)
+                          desc
+                          first-account
+                          value
+                          second-account))
     (find-file-noselect ledger)
     (with-current-buffer (get-file-buffer ledger)
       (goto-char (point-max))
