@@ -612,14 +612,6 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
 
   (setq dotspacemacs-scratch-buffer-persistent t
         dotspacemacs-activate-smartparens-mode t)
-
-  (setq wally-journal-dir "~/Wally/Journal/"
-        wally-note-dir (concat wally-journal-dir "core/")
-        wally-gtd-dir (concat wally-journal-dir "gtd/")
-        wally-data-dir (concat wally-journal-dir "data/")
-        wally-note-file (concat wally-gtd-dir "journal.org"))
-
-  (defconst wally-snap-dir (expand-file-name "~/.snap"))
   )
 
 
