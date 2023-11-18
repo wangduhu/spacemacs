@@ -328,34 +328,6 @@
       (add-to-list 'items (symbol-name (car rec))))
     items))
 
-(defconst __org-journal__ nil)
-(defconst __ledger__ nil)
-
-(defun wally/logseq-normalize ()
-  (interactive)
-  (let* ((filename (f-base (buffer-file-name)))
-         (date (parse-time-string (format "%s 00:00:00" (s-replace "_" "-" filename)))))
-    ;; 删除只有`*'的无效行
-    (goto-char (point-min))
-    (save-excursion
-      (flush-lines "^\\*$"))
-    ;; degrade top-level headings
-    (save-excursion
-      (replace-regexp "^\\* \\*?\\([0-9.:]+\\)\\*? \\(.+\\)$" "** *\\1*\n\n\\2\n"))
-    (save-excursion
-      (replace-regexp "^\\* \\*?\\([0-9.:]+\\)\\*?$" "** *\\1*"))
-    (save-excursion
-      (replace-regexp "^\\(\\* .+\\) \\(\\[\\[...assets.+\\(jpg\\|jpeg\\|png\\|webp\\)\\]\\]\\)" "\\1\n\n#+attr_org: :width 600px\n\\2\n"))
-    ;; 插入日期一级标题
-    (save-excursion
-      (insert (format "* %s\n\n" (format-time-string org-journal-date-format (encode-time date)))))
-    ;; 删除连续空行
-    (save-excursion
-      (replace-string "\n\n\n" "\n\n"))
-    ;; 如果标题前缺少空行，则补充一个
-    (save-excursion
-      (replace-regexp "\\([^\n]\\)\n\\*" "\\1\n\n*"));
-    ))
 
 (defun wally/org-task-refresh-subitems()
   (interactive)
