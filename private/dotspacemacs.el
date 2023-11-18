@@ -35,35 +35,74 @@ This function should only modify configuration layer settings."
    '(
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
-     ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
-     ;; `M-m f e R' (Emacs style) to install them.
+     ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
+     ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     ;; auto-completion
-     ;; better-defaults
+     (org :variables
+          org-want-todo-bindings t
+          org-startup-indented t
+          org-todo-keywords '((sequence "TODO(t!)" "MARK(m!)" "|" "DONE(d!)" "QUIT(q!)"))
+          org-agenda-window-setup "current-window"
+          org-agenda-restore-windows-after-quit t
+          org-agenda-start-on-weekday 0
+          org-agenda-entry-text-maxlines 1
+          org-agenda-clockreport-parameter-plist '(:link nil :maxlevel 4 :fileskip0 t)
+          org-default-priority ?C
+          ;; babel
+          org-babel-python-command "python3"
+          org-export-babel-evaluate nil
+          org-export-with-toc nil
+          org-outline-path-complete-in-steps nil
+          org-timer-default-timer 45 ; default clock countdown
+          org-log-into-drawer "LOGBOOK" ; default log org-drawer
+          org-babel-sh-command "bash"
+
+          ;; org-journal
+          org-enable-org-journal-support t
+          org-journal-file-type 'daily
+          org-journal-enable-encryption nil
+          org-journal-dir (expand-file-name "~/Wally/Journal/journals")
+          org-journal-file-format "%Y_%m_%d.org"
+          org-journal-find-file 'find-file
+          org-journal-start-on-weekday 7
+          org-journal-date-format "%A, %B %d %Y"
+          org-journal-time-format "*%H.%M*\n\n"
+          org-journal-time-prefix "\n** "
+
+          ;; misc
+          org-id-link-to-org-use-id t
+          )
+     auto-completion
+     better-defaults
+     (chinese :variables
+              ;; chinese-default-input-method 'wubi
+              pangu-spacing-real-insert-separtor nil
+              chinese-enable-youdao-dict t)
      emacs-lisp
-     ;; git
+     git
      helm
-     ;; lsp
-     ;; markdown
+     lsp
+     markdown
      multiple-cursors
-     ;; org
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
-     ;; spell-checking
-     ;; syntax-checking
-     ;; version-control
-     treemacs)
-
-
-   ;; List of additional packages that will be installed without being wrapped
-   ;; in a layer (generally the packages are installed only and should still be
-   ;; loaded using load/require/use-package in the user-config section below in
-   ;; this file). If you need some configuration for these packages, then
-   ;; consider creating a layer. You can also put the configuration in
-   ;; `dotspacemacs/user-config'. To use a local version of a package, use the
-   ;; `:location' property: '(your-package :location "~/path/to/your-package/")
-   ;; Also include the dependencies as they will not be resolved automatically.
+     (osx :variables osx-command-as       'hyper
+          osx-option-as        'meta
+          osx-control-as       'control
+          osx-function-as      nil
+          osx-right-command-as 'left
+          osx-right-option-as  'left
+          osx-right-control-as 'left
+          osx-swap-option-and-command nil)
+     spell-checking
+     syntax-checking
+     (shell :variables
+            shell-default-height 30
+            shell-default-position 'bottom)
+     treemacs
+     )
+   ;; List of additional packages that will be installed without being
+   ;; wrapped in a layer. If you need some configuration for these
+   ;; packages, then consider creating a layer. You can also put the
+   ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '()
 
    ;; A list of packages that cannot be updated.
@@ -79,7 +118,7 @@ This function should only modify configuration layer settings."
    ;; installs only the used packages but won't delete unused ones. `all'
    ;; installs *all* packages supported by Spacemacs and never uninstalls them.
    ;; (default is `used-only')
-   dotspacemacs-install-packages 'used-only))
+   dotspacemacs-install-packages 'used-but-keep-unused))
 
 (defun dotspacemacs/init ()
   "Initialization:
@@ -220,7 +259,7 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-new-empty-buffer-major-mode 'text-mode
 
    ;; Default major mode of the scratch buffer (default `text-mode')
-   dotspacemacs-scratch-mode 'text-mode
+   dotspacemacs-scratch-mode 'emacs-lisp-mode
 
    ;; If non-nil, *scratch* buffer will be persistent. Things you write down in
    ;; *scratch* buffer will be saved and restored automatically.
@@ -237,8 +276,8 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(spacemacs-dark
-                         spacemacs-light)
+   dotspacemacs-themes '(spacemacs-light
+                         spacemacs-dark)
 
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
@@ -262,7 +301,7 @@ It should only modify the values of Spacemacs settings."
                                :width normal)
 
    ;; The leader key (default "SPC")
-   dotspacemacs-leader-key "SPC"
+   dotspacemacs-leader-key ";"
 
    ;; The key used for Emacs commands `M-x' (after pressing on the leader key).
    ;; (default "SPC")
@@ -359,8 +398,8 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil the frame is maximized when Emacs starts up.
    ;; Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.
-   ;; (default t) (Emacs 24.4+ only)
-   dotspacemacs-maximized-at-startup t
+   ;; (default nil) (Emacs 24.4+ only)
+   dotspacemacs-maximized-at-startup nil
 
    ;; If non-nil the frame is undecorated when Emacs starts up. Combine this
    ;; variable with `dotspacemacs-maximized-at-startup' to obtain fullscreen
@@ -543,7 +582,7 @@ default it calls `spacemacs/load-spacemacs-env' which loads the environment
 variables declared in `~/.spacemacs.env' or `~/.spacemacs.d/.spacemacs.env'.
 See the header of this file for more information."
   (spacemacs/load-spacemacs-env)
-)
+  )
 
 (defun dotspacemacs/user-init ()
   "Initialization for user code:
@@ -551,7 +590,19 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-)
+
+
+  (setq configuration-layer-elpa-archives
+        '(("melpa-cn" . "http://mirrors.ustc.edu.cn/elpa/melpa/")
+          ("org-cn"   . "http://mirrors.ustc.edu.cn/elpa/org/")
+          ("gnu-cn"   . "http://mirrors.ustc.edu.cn/elpa/gnu/")
+          ("nongnu"   . "https://elpa.nongnu.org/nongnu/")))
+
+
+  (setq dotspacemacs-scratch-buffer-persistent t
+        dotspacemacs-activate-smartparens-mode t)
+
+  )
 
 
 (defun dotspacemacs/user-load ()
@@ -559,7 +610,7 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
 This function is called only while dumping Spacemacs configuration. You can
 `require' or `load' the libraries of your choice that will be included in the
 dump."
-)
+  )
 
 
 (defun dotspacemacs/user-config ()
@@ -568,7 +619,7 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
-)
+  )
 
 
 ;; Do not write anything past this comment. This is where Emacs will
