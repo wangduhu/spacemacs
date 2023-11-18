@@ -536,8 +536,28 @@
     (if (not snippet)
         (error "no snippet specified"))
     (org-insert-subheading nil)
-    (insert snippet)
-    (yas-expand)))
+    (save-excursion
+      (insert snippet)
+      (yas-expand))
+    (wally/org-complete-properties)
+    ))
+
+(defun wally/org-item-jump (arg)
+  "跳转到当前项所属目录的最新文件"
+  (interactive "P")
+  (let ((item-dir (f-join (org-entry-get nil "PARENT_DIR" t)
+                          (wally/org-get-heading-no-progress)))
+        filepath)
+    (message "%s" item-dir)
+    (if (equal arg 4)
+        (progn
+          (f-mkdir item-dir)
+          (find-file item-dir))
+      (setq filepath item-dir)          ; TODO 改成最近访问的文件
+      (if (f-exists-p filepath)
+          (find-file filepath)
+        (error "No such file: %s" filepath)))))
+
 
 (defun wally/org-complete-properties ()
   "add required properties for given heading"
