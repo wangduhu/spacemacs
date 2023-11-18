@@ -315,8 +315,7 @@ Each entry is either:
           org-agenda-files (append (list (f-join wally-refs-dir "index.org")
                                          (f-join wally-journal-dir "data" "reference.org")
                                          )
-                                   (directory-files wally-gtd-dir t ".+\.org")
-                                   (directory-files wally-note-dir t ".+\.org"))
+                                   nil)
           org-agenda-custom-commands (list '(";" "key tasks" agenda "" ((org-agenda-span 'day)
                                                                         (org-agenda-skip-function
                                                                          '(org-agenda-skip-entry-if

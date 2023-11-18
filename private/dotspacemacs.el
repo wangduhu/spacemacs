@@ -48,6 +48,10 @@ This function should only modify configuration layer settings."
           org-agenda-entry-text-maxlines 1
           org-agenda-clockreport-parameter-plist '(:link nil :maxlevel 4 :fileskip0 t)
           org-default-priority ?C
+          org-agenda-time-grid nil
+          org-agenda-files (append (directory-files wally-gtd-dir t ".+\.org")
+                                   (directory-files wally-note-dir t ".+\.org"))
+
           ;; babel
           org-babel-python-command "python3"
           org-export-babel-evaluate nil
@@ -71,6 +75,8 @@ This function should only modify configuration layer settings."
 
           ;; misc
           org-id-link-to-org-use-id t
+          org-crypt-tag-matcher "secret"
+          org-crypt-key nil
           )
      auto-completion
      better-defaults
@@ -604,6 +610,11 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (setq dotspacemacs-scratch-buffer-persistent t
         dotspacemacs-activate-smartparens-mode t)
 
+  (setq wally-journal-dir "~/Wally/Journal/"
+        wally-note-dir (concat wally-journal-dir "core/")
+        wally-gtd-dir (concat wally-journal-dir "gtd/")
+        wally-data-dir (concat wally-journal-dir "data/")
+        wally-note-file (concat wally-gtd-dir "journal.org"))
   )
 
 
