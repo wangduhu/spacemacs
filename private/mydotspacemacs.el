@@ -98,7 +98,6 @@ This function should only modify configuration layer settings."
                                               clang-format-style-option "Google"
                                               c-c++-enable-google-newline t
                                               c-c++-enable-google-style t
-                                              c-c++-enable-rtags-support t
                                               c-c++-backend 'lsp-clangd
                                               c-basic-offset 4
                                               c-c++-lsp-enable-semantic-highlight 'rainbow

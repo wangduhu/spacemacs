@@ -32,8 +32,7 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
-     ;; ----------------------------------------------------------------
+   '(;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
@@ -84,6 +83,24 @@ This function should only modify configuration layer settings."
               ;; chinese-default-input-method 'wubi
               pangu-spacing-real-insert-separtor nil
               chinese-enable-youdao-dict t)
+     (c-c++ :variables
+            tab-width 4
+            c-c++-default-mode-for-headers 'c++-mode
+            c-c++-enable-clang-support t
+            clang-format-style-option "Google"
+            c-c++-enable-google-newline t
+            c-c++-enable-google-style t
+            c-c++-backend 'lsp-clangd
+            c-basic-offset 4
+            c-c++-lsp-enable-semantic-highlight 'rainbow
+            c-c++-enable-clang-format-on-save nil
+            c-c++-enable-organize-includes-on-save nil
+            c-c++-enable-auto-newline nil
+            )
+     (cmake :variables
+            cmake-backend 'company-cmake
+            cmake-enable-cmake-ide-support nil
+            )
      (deft :variables
            deft-recursive t
            deft-use-filter-string-for-filename t
@@ -93,8 +110,19 @@ This function should only modify configuration layer settings."
      emacs-lisp
      finance
      git
+     gtags
      helm
+     (html :variables
+           web-mode-markup-indent-offset 2
+           web-mode-css-indent-offset 2
+           web-mode-code-indent-offset 2
+           web-mode-indent-style 2)
+     (json :variable
+           json-fmt-on-save t
+           json-fmt-tool 'web-beautify)
+     latex
      lsp
+     lua
      markdown
      multiple-cursors
      (osx :variables osx-command-as       'hyper
@@ -105,14 +133,27 @@ This function should only modify configuration layer settings."
           osx-right-option-as  'left
           osx-right-control-as 'left
           osx-swap-option-and-command nil)
+     pandoc
+     plantuml
+     (python :variables
+             python-backend 'anaconda
+             python-sort-imports-on-save t
+             python-enable-yapf-format-on-save t)
      search-engine
      semantic
      spell-checking
+     sql
      syntax-checking
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
+     shell-scripts
+     spacemacs-defaults
+     spacemacs-editing
+     spacemacs-editing-visual
+     spacemacs-navigation
      treemacs
+     yaml
      ;; private
      mw
      )
@@ -618,6 +659,14 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
 
   (setq dotspacemacs-scratch-buffer-persistent t
         dotspacemacs-activate-smartparens-mode t)
+
+  (setq wally-journal-dir "~/Wally/Journal/"
+        wally-note-dir (concat wally-journal-dir "core/")
+        wally-gtd-dir (concat wally-journal-dir "gtd/")
+        wally-data-dir (concat wally-journal-dir "data/")
+        wally-note-file (concat wally-gtd-dir "journal.org")
+        wally-anki-dir (concat wally-journal-dir "card/")
+        )
   )
 
 
