@@ -1,6 +1,8 @@
 (defconst mw-packages '(org
                         anki-editor
-                        epc))
+                        epc
+                        org-tempo
+                        ))
 
 
 (defun mw/post-init-org ()
