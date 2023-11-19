@@ -84,6 +84,12 @@ This function should only modify configuration layer settings."
               ;; chinese-default-input-method 'wubi
               pangu-spacing-real-insert-separtor nil
               chinese-enable-youdao-dict t)
+     (deft :variables
+           deft-recursive t
+           deft-use-filter-string-for-filename t
+           deft-default-extension "org"
+           deft-directory "~/Wally/data/deft"
+           )
      emacs-lisp
      finance
      git
