@@ -684,19 +684,23 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  ;; env
+  (setenv "GPG_AGENT_INFO" nil)
 
-  ;; hook
-  (add-hook 'kill-buffer-hook 'wally/snap-delete-file-on-close)
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-  ;; gpg
+  ;; variable
+  (setq bookmark-default-file (f-join wally-journal-dir "data/bookmarks"))
+  (setq debug-on-error nil)
+  (setq projectile-indexing-method 'native)
+  (setq browse-url-browser-function 'browse-url-generic
+        browse-url-generic-program (if (eq system-type 'darwin) "open" "firefox"))
+  (setq default-buffer-file-coding-system 'utf-8)
+  (setq mac-command-modifier 'meta)
+  (setq whitespace-line-column 121) ;; limit line length
+  (setq whitespace-style '(face lines-tail))
   (setq epa-pinentry-mode 'loopback
         epa-file-select-keys 0
         ;; ask encryption password once
         epa-file-cache-passphrase-for-symmetric-encryption t)
-  (epa-file-enable)
-
-  ;; search-engine
   (setq search-engine-alist (append search-engine-alist
                                     '((cmake :name "CMake" :url "https://cmake.org/cmake/help/v3.0/search.html?q=%s&check_keywords=yes&area=default")
                                       (opencv :name "OpenCV" :url "https://docs.opencv.org/master/search/all_d.html?%s")
@@ -708,6 +712,44 @@ before packages are loaded."
                                       (cpp :name "cpp" :url "http://www.cplusplus.com/search.do?q=%s")
                                       (leetcode :name "leetcode" :url "https://leetcode-cn.com/problems/%s/")
                                       )))
+
+  ;; hook
+  (add-hook 'kill-buffer-hook 'wally/snap-delete-file-on-close)
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
+  (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2)))
+  (add-hook 'after-change-major-mode-hook
+            (lambda () (modify-syntax-entry ?_ "w")))
+
+  (add-hook 'org-mode-hook
+            (lambda () (modify-syntax-entry ?- "w")))
+
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda () (modify-syntax-entry ?- "w")))
+
+  ;; mode
+  (global-pangu-spacing-mode 1)
+  (global-undo-tree-mode)
+
+  (prefer-coding-system 'utf-8)
+
+  ;; dired
+  (eval-after-load "dired-aux"
+    '(add-to-list 'dired-compress-file-suffixes
+                  '("\\.zip\\'" ".zip" "unzip")))
+
+  ;; smartparens
+  (show-smartparens-global-mode 1)
+  (smartparens-global-mode t)
+  (sp-with-modes '(c-mode c++-mode)
+    (sp-local-pair "{" nil :post-handlers '(("||\n[i]" "ret")))
+    (sp-local-pair "/*" "*/" :post-handlers '((" | " "spc")
+                                              ("* ||\n[i]" "ret"))))
+  (sp-local-pair 'org-mode "《" "》")
+  (sp-local-pair 'org-mode "（" "）")
+  (sp-local-pair 'org-mode "“" "”")
+  (sp-local-pair 'org-mode "\[" "\]")
+
+  (display-time-mode 1)
   )
 
 
