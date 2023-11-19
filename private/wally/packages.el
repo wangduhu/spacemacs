@@ -10,7 +10,6 @@
       cnfonts
       dirvish
       emacsql-sqlite
-      epc
       highlight-function-calls
       ;; log4e
       org-dashboard
@@ -121,10 +120,6 @@ Each entry is either:
   (use-package emacsql-sqlite
     :config
     (setq mydb (emacsql-sqlite (format "%s/data/my.db" wally-journal-dir)))))
-
-(defun wally/init-epc ()
-  (use-package epc
-    ))
 
 (defun wally/init-highlight-function-calls ()
   (use-package highlight-function-calls))

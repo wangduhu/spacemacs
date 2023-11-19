@@ -1,4 +1,4 @@
-(defconst mw-packages '(org))
+(defconst mw-packages '(org epc))
 
 
 (defun mw/post-init-org ()
@@ -21,3 +21,11 @@
           org-download-backend t
           )
     ))
+
+
+(epcdefun mw/init-epc ()
+    (use-package epc
+      :init
+      (setq wally-epc nil)
+      )
+    )
