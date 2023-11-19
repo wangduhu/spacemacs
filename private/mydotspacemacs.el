@@ -824,27 +824,6 @@ before packages are loaded."
   (setq projectile-indexing-method 'native)
 
   ;; org-protocol begin
-  (org-link-set-parameters
-   "org-protocol"
-   :export (lambda (path desc backend)
-             (cond
-              ((eq 'html backend)
-               (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
-              ((or (eq 'hugo backend) (eq 'md backend))
-               (format "[%s](org-protocol:%s)" desc path))
-              )))
-
-  (org-link-set-parameters
-   "org-protocol"
-   :export (lambda (path desc backend)
-             (cond
-              ((eq 'html backend)
-               (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
-              ((eq 'hugo backend)
-               (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
-              ((eq 'md backend)
-               (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
-              )))
 
   (require 'org-protocol)
   (add-to-list 'org-protocol-protocol-alist

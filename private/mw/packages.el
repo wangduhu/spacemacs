@@ -23,6 +23,18 @@
           org-download-timestamp "%Y-%m-%d-%H-%M-%S"
           org-download-backend t
           )
+    ;; org-protocol
+    (org-link-set-parameters
+     "org-protocol"
+     :export (lambda (path desc backend)
+               (cond
+                ((eq 'html backend)
+                 (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
+                ((eq 'hugo backend)
+                 (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
+                ((eq 'md backend)
+                 (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
+                )))
     ))
 
 
