@@ -226,6 +226,56 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
     (save-buffer)
     (message "add ledger item: %s(%s)" desc value)))
 
+;; anki
+(defvar __anki__ nil)
+
+(defun wally/anki-is-note-existed (title)
+  "判断指定title的anki note是否已存在于数据库中，存在返回note id，否则返回nil"
+  (epc:call-sync wally-epc 'anki_query_note (list title)))
+
+(defun wally/anki-get-note (id)
+  "判断指定title的anki note是否已存在于数据库中，存在返回note id，否则返回nil"
+  (epc:call-sync wally-epc 'anki_get_note (list id)))
+
+(defun wally/anki-export-current-card ()
+  "导出当前文件为anki卡片"
+  (let (card-id)
+    (goto-char (point-min))
+    (re-search-forward "^\\* " nil t 1)
+    (setq card-id (org-entry-get nil "ANKI_NOTE_ID"))
+    (unless card-id
+      (message "unexported note: %s" (buffer-file-name))
+      (setq card-id (wally/anki-is-note-existed (nth 4 (org-heading-components))))
+      (if card-id
+          (org-set-property "ANKI_NODE_ID" (format "%s" card-id))
+        (anki-editor-push-notes))
+      (save-buffer))))
+
+(defun wally/anki-get-exported-card ()
+  "获取所有已导出的anki卡片文件"
+  (let ((default-directory wally-anki-dir)
+        (pattern "\\([0-9]+\\.org\\)::ANKI_NOTE_ID: [0-9]+$")
+        output
+        exported-cards)
+    (setq output (shell-command-to-string "grep 'ANKI_NOTE_ID' *.org"))
+    (mapcar (lambda (l) (if (string-match pattern l) (add-to-list 'exported-cards (match-string 1 l))))
+            (s-split "\n" output))
+    exported-cards))
+
+(defun wally/anki-export-all-left-cards ()
+  "导出card文件夹下所有文件为anki卡片"
+  (interactive)
+   (mapcar (lambda (f)
+             (let ((exported-cards (wally/anki-get-exported-card))
+                   (filename (f-filename f)))
+               (message "scanning %s" filename)
+               (when (and (s-starts-with-p "2" filename) (string-match "^[0-9]+\\.org$" filename) (not (member filename exported-cards)))
+                 (find-file-noselect f)
+                 (with-current-buffer (get-file-buffer f)
+                   (wally/anki-export-current-card))
+                 (kill-buffer (get-file-buffer f)))))
+           (f-files wally-anki-dir (lambda (f) (string-match "^[0-9]+$" (f-base f))))))
+
 
 ;; orgmode
 (defvar __orgmode__ nil)

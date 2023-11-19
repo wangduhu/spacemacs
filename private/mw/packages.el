@@ -1,4 +1,6 @@
-(defconst mw-packages '(org epc))
+(defconst mw-packages '(org
+                        anki-editor
+                        epc))
 
 
 (defun mw/post-init-org ()
@@ -9,7 +11,8 @@
           wally-note-dir (concat wally-journal-dir "core/")
           wally-gtd-dir (concat wally-journal-dir "gtd/")
           wally-data-dir (concat wally-journal-dir "data/")
-          wally-note-file (concat wally-gtd-dir "journal.org"))
+          wally-note-file (concat wally-gtd-dir "journal.org")
+          )
     (defconst wally-snap-dir (expand-file-name "~/.snap"))
     :hook
     (org-mode . (lambda () (smartparens-mode t)))
@@ -23,9 +26,15 @@
     ))
 
 
-(epcdefun mw/init-epc ()
-    (use-package epc
-      :init
-      (setq wally-epc nil)
-      )
-    )
+(defun mw/init-anki-editor ()
+  (use-package anki-editor
+    :init
+    (setq wally-anki-dir (concat wally-journal-dir "card/"))
+    ))
+
+
+(defun mw/init-epc ()
+  (use-package epc
+    :init
+    (setq wally-epc nil)
+    ))
