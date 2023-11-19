@@ -3,25 +3,17 @@
   (cond
    (wally-is-pc
     '(
-      anki-editor
-      annotate
       calfw
       calfw-org
-      cnfonts
-      dirvish
       emacsql-sqlite
-      highlight-function-calls
       ;; log4e
       org-dashboard
       ;; org-media-note
-      org-noter
       org-randomnote
       org-random-todo
       ;; org-roam
       ;; org-roam-ui
       simple-httpd
-      sr-speedbar
-      ssh-deploy
       vue-mode
       (wally-dice :location local)
       (wally-anki :location local)
@@ -38,13 +30,10 @@
   (append
    '(
      buttercup
-     easy-kill
      elisp-format
-     nlinum-hl
      org
      org-super-agenda
      ;; ox-latex
-     projectile
      yasnippet
      ;; local
      (wally-utils :location local)
@@ -80,15 +69,6 @@ Each entry is either:
       - A list beginning with the symbol `recipe' is a melpa
         recipe.  See: https://github.com/milkypostman/melpa#recipe-format")
 
-(defun wally/init-anki-editor ()
-  (use-package anki-editor))
-
-(defun wally/post-init-annotate ()
-  (use-package annotate
-    :after org
-    :config
-    (setq annotate-file (concat wally-journal-dir "data/annotations"))
-    ))
 
 (defun wally/init-buttercup ()
   (use-package buttercup))
@@ -99,20 +79,6 @@ Each entry is either:
 (defun wally/init-calfw-org ()
   (use-package calfw-org))
 
-(defun wally/init-cnfonts ()
-  (use-package cnfonts
-    :config
-    (cnfonts-enable)))
-
-(defun wally/init-dirvish ()
-  (use-package dirvish
-    ))
-
-(defun wally/init-easy-kill ()
-  (use-package easy-kill
-    :bind
-    ([remap kill-ring-save] . easy-kill)))
-
 (defun wally/init-elisp-format ()
   (use-package elisp-format))
 
@@ -121,8 +87,6 @@ Each entry is either:
     :config
     (setq mydb (emacsql-sqlite (format "%s/data/my.db" wally-journal-dir)))))
 
-(defun wally/init-highlight-function-calls ()
-  (use-package highlight-function-calls))
 
 (defun wally/init-log4e ()
   (use-package log4e
@@ -131,12 +95,6 @@ Each entry is either:
     (hoge--log-enable-logging)
     ))
 
-(defun wally/init-nlinum-hl ()
-  (use-package nlinum-hl
-    :hook
-    (prog-mode . (lambda ()
-                   (nlinum-mode nil)))
-    ))
 
 (defun wally/init-org-dashboard ()
   (use-package org-dashboard
@@ -160,11 +118,6 @@ Each entry is either:
     (setq org-media-note-screenshot-image-dir "~/Wally/Journal/assets/mpv"))
   )
 
-(defun wally/init-org-noter ()
-  (use-package org-noter
-    :config
-    (setq org-noter-always-create-frame nil)
-    ))
 
 (defun wally/init-org-random-todo ()
   (use-package org-random-todo
@@ -198,27 +151,6 @@ Each entry is either:
           )
     ))
 
-(defun wally/post-init-projectile ()
-  (use-package projectile
-    :config
-    (setq projectile-enable-caching t
-          projectile-project-root-files-bottom-up '(".projectile")
-          projectile-indexing-method 'native)
-    ))
-
-(defun wally/init-sr-speedbar ()
-  (use-package sr-speedbar
-    :init
-    (setq sr-speedbar-right-side  nil
-          speedbar-use-images nil
-          speedbar-tag-hierarchy-method nil
-          speedbar-update-flag nil
-          sr-speedbar-auto-refresh nil
-          )
-    :config
-    (speedbar-disable-update)
-    ))
-
 (defun wally/init-simple-httpd ()
   (use-package simple-httpd
     :init
@@ -226,23 +158,10 @@ Each entry is either:
           httpd-port-proxy "7071")
     ))
 
-(defun wally/init-ssh-deploy ()
-  (use-package ssh-deploy
-    :bind
-    (:map ssh-deploy-prefix-map
-          ("f" . ssh-deploy-upload-handler-forced))))
 
 (defun wally/init-vue-mode ()
   (use-package vue-mode
     :mode "\\.vue\\'"))
-
-(defun wally/post-init-yasnippet ()
-  (use-package sr-speedbar
-    :init
-    (setq yas-snippet-dirs (list "~/.emacs.d/private/snippets"))
-    :config
-    (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
-    ))
 
 (defun wally/post-init-org-roam ()
   (use-package org-roam
