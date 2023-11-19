@@ -1,10 +1,3 @@
-(defun wally/org-download-image-and-limit-size (link)
-  (interactive "sLink: ")
-  (save-excursion
-    (org-download-image link))
-  (next-line)
-  (end-of-line)
-  (insert "\n#+attr_org: :width 500"))
 
 (defun wally/org-show-outline-path ()
   (interactive)

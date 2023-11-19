@@ -537,12 +537,6 @@ the calculated number of days."
           $items (s-split "\n" output))
     $items))
 
-(defun wally/copyq-download-clipboard-image()
-  (interactive)
-  (let ((tmp-path (make-temp-file "" nil ".png")))
-    (shell-command (format "copyq read image/png > %s" tmp-path))
-    (wally/org-download-image-and-limit-size (format "file://%s" tmp-path))))
-
 (defun wally/bookmark-add-url(url)
   (interactive "sBookmark URL: ")
   (if (assoc url bookmark-alist)

@@ -371,11 +371,7 @@ Each entry is either:
           org-random-todo-files (list (f-join wally-dice-dir "inbox" "tasks.org"))
           org-random-todo-how-often (* 3600 3)
           ;; org-download
-          org-download-method 'directory
-          org-download-image-dir (concat wally-journal-dir "assets/download")
-          org-download-heading-lvl nil
-          org-download-timestamp "%Y-%m-%d-%H-%M-%S"
-          org-download-backend t)
+          )
 
     (setq wally-pros-note (f-join wally-gtd-dir "pros.org"))
 

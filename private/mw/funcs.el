@@ -206,3 +206,21 @@
     (org-archive-subtree)
     (save-buffer)
     (message "add ledger item: %s(%s)" desc value)))
+
+
+;; orgmode
+(defvar __orgmode__ nil)
+
+(defun wally/org-download-image-and-limit-size (link)
+  (interactive "sLink: ")
+  (save-excursion
+    (org-download-image link))
+  (next-line)
+  (end-of-line)
+  (insert "\n#+attr_org: :width 500"))
+
+(defun wally/copyq-download-clipboard-image()
+  (interactive)
+  (let ((tmp-path (make-temp-file "" nil ".png")))
+    (shell-command (format "copyq read image/png > %s" tmp-path))
+    (wally/org-download-image-and-limit-size (format "file://%s" tmp-path))))

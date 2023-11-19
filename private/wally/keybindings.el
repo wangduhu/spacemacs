@@ -187,8 +187,6 @@
 
   "Dc" 'wally/org-scramy-item
   "Dd" 'wally/org-load-data-from-db
-  "id" 'wally/org-download-image-and-limit-size
-  "iD" 'wally/copyq-download-clipboard-image
   "ii" 'wally/image-download "iS" 'org-attach-screenshot
   "lc" 'wally/finance-convert-orgheading-to-ledger-item
   "sg" 'org-refile-goto-last-stored

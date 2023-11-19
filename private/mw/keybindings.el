@@ -12,4 +12,6 @@
 (spacemacs/set-leader-keys-for-major-mode 'org-mode
   "p" 'org-pomodoro
   "fl" 'wally/finance-convert-orgheading-to-ledger-item
+  "id" 'wally/org-download-image-and-limit-size
+  "iD" 'wally/copyq-download-clipboard-image
   )
