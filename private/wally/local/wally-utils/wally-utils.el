@@ -269,12 +269,6 @@
     (helm-other-buffer 'source "temp dir")
     ))
 
-(defun wally/file-lastest-temp-file()
-  (let ((sandbox wally-file-temp-dir) target)
-    (setq target (car (car (sort (directory-files-and-attributes sandbox t "^[^\\.].*\\.[a-z]+$")
-                                 #'(lambda (x y)
-                                     (time-less-p (nth 6 y) (nth 6 x)))))))
-    target))
 
 (defun wally/file-trash-misc-files()
   (interactive)
@@ -293,14 +287,6 @@
   (let ((filename (buffer-file-name)))
     (wally/file-quick-backup filename)
     (message "backuped")))
-
-(defun wally/dired-fetch-latest-file()
-  (interactive)
-  (let ((src-file (wally/file-lastest-temp-file))
-        (dst-dir default-directory))
-    (f-move src-file (format "%s/" dst-dir))
-    (message "move %s to %s" src-file dst-dir)))
-
 
 ;; snap utils
 

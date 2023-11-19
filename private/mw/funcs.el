@@ -54,6 +54,25 @@ TODO 不需要 cond参数，还不会写宏，参考http://0x100.club/wiki_emacs
     ))
 
 
+;;  dired
+(defconst __dired__ nil)
+
+(defun wally/file-lastest-temp-file()
+  (let ((sandbox (expand-file-name "~/Desktop"))
+        target)
+    (setq target (car (car (sort (directory-files-and-attributes sandbox t "^[^\\.].*\\.[a-z]+$")
+                                 #'(lambda (x y)
+                                     (time-less-p (nth 6 y) (nth 6 x)))))))
+    target))
+
+(defun wally/dired-fetch-latest-file()
+  (interactive)
+  (let ((src-file (wally/file-lastest-temp-file))
+        (dst-dir default-directory))
+    (f-move src-file (format "%s/" dst-dir))
+    (message "move %s to %s" src-file dst-dir)))
+
+
 ;; snap
 (defconst __snap__ nil)
 
