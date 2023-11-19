@@ -192,16 +192,9 @@ Each entry is either:
     :commands wally/org-summary-todo
     :init
     (add-hook 'org-after-todo-statistics-hook #'wally/org-summary-todo)
-    (add-to-list 'org-src-lang-modes '(("html" . web)
-                                       ("browser" . nxhtml)
-                                       ("php" . php)
-                                       ("cmake" . cmake)
-                                       ("gdb" . GDB-Script)
-                                       ("makefile" . makefile)
-                                       ("markdown" . markdown)))
+
     :hook
     (org-mode . (lambda()
-                  (auto-fill-mode t)
                   (smartparens-mode t)
                   (autoload 'iimage-mode "iimage" "Support Inline image minor mode." t)
                   (autoload 'turn-on-iimage-mode "iimage" "Turn on Inline image minor mode." t)
@@ -263,20 +256,9 @@ Each entry is either:
                                    "** \n%u"
                                    :empty-lines 1 :immediate-finish t :jump-to-captured t)
                                   )
-          ;; refile
-          org-outline-path-complete-in-steps nil
-          org-refile-allow-creating-parent-nodes 'confirm
           ;; org-refile-allow-creating-parent-nodes 'confirm org-refile-targets '(("~/Wally/Journal/note/journal.org"
           ;;                                                                       :regexp . "JOURNAL"))
-          org-refile-use-outline-path 'file
           wally-dice-files (directory-files wally-dice-dir t ".+\.org")
-          wally-note-files (directory-files wally-note-dir t ".+\.org")
-          org-refile-targets '(
-                               ;; (nil :maxlevel . 1) ;; current
-                               (wally-dice-files :maxlevel . 1)
-                               (wally-note-files :maxlevel . 1)
-                               ;; ((list wally-note-file) :maxlevel . 1)
-                               )
 
           ;; archive
           org-archive-location "~/Wally/Journal/data/anki-inbox.org::** content" ; org-archive

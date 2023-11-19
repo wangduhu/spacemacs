@@ -48,8 +48,6 @@ This function should only modify configuration layer settings."
           org-agenda-clockreport-parameter-plist '(:link nil :maxlevel 4 :fileskip0 t)
           org-default-priority ?C
           org-agenda-time-grid nil
-          org-agenda-files (append (directory-files wally-gtd-dir t ".+\.org")
-                                   (directory-files wally-note-dir t ".+\.org"))
 
           ;; babel
           org-babel-python-command "python3"
@@ -59,18 +57,6 @@ This function should only modify configuration layer settings."
           org-timer-default-timer 45 ; default clock countdown
           org-log-into-drawer "LOGBOOK" ; default log org-drawer
           org-babel-sh-command "bash"
-
-          ;; org-journal
-          org-enable-org-journal-support t
-          org-journal-file-type 'daily
-          org-journal-enable-encryption nil
-          org-journal-dir (expand-file-name "~/Wally/Journal/journals")
-          org-journal-file-format "%Y_%m_%d.org"
-          org-journal-find-file 'find-file
-          org-journal-start-on-weekday 7
-          org-journal-date-format "%A, %B %d %Y"
-          org-journal-time-format "*%H.%M*\n\n"
-          org-journal-time-prefix "\n** "
 
           ;; misc
           org-id-link-to-org-use-id t

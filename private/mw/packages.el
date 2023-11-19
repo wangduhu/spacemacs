@@ -16,36 +16,6 @@
                         ))
 
 
-(defun mw/post-init-org ()
-  (use-package org
-    :requires f
-    :init
-    (defconst wally-snap-dir (expand-file-name "~/.snap"))
-    :hook
-    (org-mode . (lambda () (smartparens-mode t)))
-    :config
-    (setq org-download-method 'directory
-          org-download-image-dir (concat wally-journal-dir "assets/img/download")
-          org-download-heading-lvl nil
-          org-download-timestamp "%Y-%m-%d-%H-%M-%S"
-          org-download-backend t
-          )
-    (require 'org-tempo)
-    ;; org-protocol
-    (org-link-set-parameters
-     "org-protocol"
-     :export (lambda (path desc backend)
-               (cond
-                ((eq 'html backend)
-                 (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
-                ((eq 'hugo backend)
-                 (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
-                ((eq 'md backend)
-                 (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
-                )))
-    ))
-
-
 (defun mw/init-anki-editor ()
   (use-package anki-editor
     ))
@@ -148,4 +118,74 @@
     (setq yas-snippet-dirs (list "~/.emacs.d/private/snippets"))
     :config
     (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
+    ))
+
+
+(defun mw/post-init-org ()
+  (use-package org
+    :requires f
+    :init
+    (defconst wally-snap-dir (expand-file-name "~/.snap"))
+    :hook
+    (org-mode . (lambda ()
+                  (smartparens-mode t)
+                  (auto-fill-mode t)))
+    :config
+    (setq org-agenda-files (append (directory-files wally-gtd-dir t ".+\.org")
+                              (directory-files wally-note-dir t ".+\.org"))
+
+          ;; download
+          org-download-method 'directory
+          org-download-image-dir (concat wally-journal-dir "assets/img/download")
+          org-download-heading-lvl nil
+          org-download-timestamp "%Y-%m-%d-%H-%M-%S"
+          org-download-backend t
+
+          ;; refile
+          org-outline-path-complete-in-steps nil
+          org-refile-use-outline-path 'file
+          org-refile-allow-creating-parent-nodes 'confirm
+          org-refile-targets '(((directory-files wally-note-dir t ".+\.org") :maxlevel . 1))
+
+          ;; org-journal
+          org-enable-org-journal-support t
+          org-journal-file-type 'daily
+          org-journal-enable-encryption nil
+          org-journal-dir (expand-file-name "~/Wally/Journal/journals")
+          org-journal-file-format "%Y_%m_%d.org"
+          org-journal-find-file 'find-file
+          org-journal-start-on-weekday 7
+          org-journal-date-format "%A, %B %d %Y"
+          org-journal-time-format "*%H.%M*\n\n"
+          org-journal-time-prefix "\n** "
+          org-file-apps '((auto-mode . emacs)
+                          ("\\.mm\\'" . default)
+                          (directory . emacs)
+                          ;; ("\\html\\'" . "firefox %s")
+                          ("\\.html\\'" . system)
+                          ("\\.pdf\\'" . system)
+                          ("\\.xmind\\'" . system)
+                          ("\\.\\(mp4\\|mov\\|avi\\|wmv\\)\\'" . "mpv %s"))
+
+          )
+    (add-to-list 'org-src-lang-modes '(("html" . web)
+                                       ("browser" . nxhtml)
+                                       ("php" . php)
+                                       ("cmake" . cmake)
+                                       ("gdb" . GDB-Script)
+                                       ("makefile" . makefile)
+                                       ("markdown" . markdown)))
+    (require 'org-tempo)
+    ;; org-protocol
+    (org-link-set-parameters
+     "org-protocol"
+     :export (lambda (path desc backend)
+               (cond
+                ((eq 'html backend)
+                 (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
+                ((eq 'hugo backend)
+                 (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
+                ((eq 'md backend)
+                 (format "<a href=\"org-protocol:%s\">%s</a>" path desc))
+                )))
     ))
