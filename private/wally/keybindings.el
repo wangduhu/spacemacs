@@ -5,8 +5,6 @@
 ;;                         (delete-other-frames)
 ;;                         (jump-to-register 119)))
 (global-set-key [f7] 'wally/dice)
-;; (global-set-key [f8] 'wally/macro-browse-db-item)
-(global-set-key [f8] 'deft)
 (global-set-key [f9] 'wally/macro-join-next-line)
 (global-set-key "\C-\M-y" 'yas-expand)
 (global-set-key "\C-\M-k" 'kill-sexp)
@@ -14,11 +12,6 @@
 ;; elfeed-mark-all-as-read
 
 (spacemacs/set-leader-keys
-  ";" 'nil
-  "@" 'pop-global-mark
-  "#" 'org-mark-ring-push
-  "$" 'org-mark-ring-goto
-  "," 'org-ctrl-c-ctrl-c
   "'" '(lambda ()
          (interactive)
          (let ((buffer "*eshell*"))
@@ -28,18 +21,6 @@
   "Kb" 'kmacro-bind-to-key
   "Ki" 'insert-kbd-macro
   "Kn" 'kmacro-name-last-macro
-  "aa" 'org-agenda
-  ;; "aa" '(lambda ()
-  ;;   (interactive)
-  ;;   (let ((buffer-name "*Org Agenda*")
-  ;;         (buffer))
-  ;;     (setq buffer (get-buffer buffer-name))
-  ;;     (if (not buffer)
-  ;;         (org-agenda)
-  ;;       (switch-to-buffer buffer)
-  ;;       (org-agenda-redo))))
-  "ac" 'org-capture
-  "ae" 'eval-last-sexp
   "aj" 'helm-bookmarks
   "al" 'delete-blank-lines
   "ab" 'helm-bookmarks
@@ -49,14 +30,7 @@
           (annotate-annotate)
           (annotate-save-annotations))
   "aN" 'wally/org-export-note
-  "a/" 'spacemacs/search-engine-select
   "bB" 'mark-whole-buffer
-  "ba" 'wally/buffer-switch-to-agenda
-  "bm" 'wally/buf-switch-to-message-buffer
-  "bs" 'spacemacs/switch-to-scratch-buffer
-  "bo" 'wally/buf-switch-to-org-note-buffer
-  "bt" 'wally/buf-switch-to-temp-buffer
-  "b <SPC>" '(lambda() (interactive) (find-file "~/.emacs.d/private/dotspacemacs.el"))
   "cs" 'sp-copy-sexp
   "cz" 'ssh-deploy-prefix-map
   "ei" 'edit-indirect-region
@@ -66,16 +40,10 @@
   "fd" 'dired-at-point
   "fq" 'read-only-mode
   "fw" 'ido-write-file
-  "gd" 'magit-diff-buffer-file
   "gg" 'goto-line
   "gI" 'wally/helm-gitignore
-  "hf" 'describe-function
-  "hk" 'describe-key
-  "hs" 'highlight-symbol-at-point
-  "hp" 'wally/highlight-phrase
   "hv" 'describe-variable
   "hR" 'helm-mark-ring
-  "hu" 'wally/unhighlight-symbol-at-point
   "hr" 'helm-global-mark-ring
   "ja" 'beginning-of-defun
   "jA" 'sp-beginning-of-sexp
@@ -85,16 +53,13 @@
   "jp" 'xref-pop-marker-stack
   "jr" 'xref-find-references
   "KR" 'wally/macro-repeat-to-end
-  "pA" 'helm-projectile-ack
   "pG" 'projectile-find-tag
-  "pg" 'project-find-regexp
   "pn" '(lambda()
     (interactive)
     (find-file (concat (projectile-acquire-root) "README.org"))
     )
   "pu" 'sp-backward-unwrap-sexp
   "p <tab>" 'wally/projectile-recent-file
-  "qc" 'quick-calc
   "rj" 'jump-to-register
   "rk" 'kill-rectangle
   "rt" 'string-rectangle
@@ -108,9 +73,6 @@
   "smf" 'fundamental-mode
   "sr" 'sr-speedbar-toggle
   "wj" 'wally@julie
-  "<tab>" 'spacemacs/alternate-buffer
-  "`" 'wally/tmp
-
   ";Pc" 'wally/org-pomodoro-contine-current-task
   ";Vu" 'wally/video-update-info
   ";Vv" 'wally/evil-add-new-video
@@ -190,22 +152,11 @@
   "ii" 'wally/image-download "iS" 'org-attach-screenshot
   "lc" 'wally/finance-convert-orgheading-to-ledger-item
   "sg" 'org-refile-goto-last-stored
-  "sc" 'org-capture-goto-last-stored
   "st" 'wally/org-add-arhive-tag
   "sR" 'wally/org-refile-local
   "sv" 'wally/org-archive-preprocess
   "tr" 'wally/org-task-refresh-subitems
   "tf" 'wally/org-table-eval-formulas
-  "tk" 'wally/org-table-kill-cell
-  "t+" 'org-table-sum
-  "t." '(lambda()
-    (interactive)
-    (let (row col coor)
-      (setq row (org-table-current-line))
-      (setq col (org-table-current-column))
-      (setq coor (format "@%d$%d" row col))
-      (kill-new coor)
-      (message coor)))
   "wL" 'wally/org-clear-logbook
   "wd" 'wally/task-finish
   "wl" 'wally/org-delink-at-point
@@ -217,10 +168,6 @@
          (interactive)
          (insert (format-time-string "%Y-%m-%d" (current-time))))
   "<tab>" 'wally/org-hiden-subtree
-  )
-
-(spacemacs/set-leader-keys-for-major-mode 'org-journal-mode
-  "lh" 'wally/org-journal-format-heading
   )
 
 (spacemacs/set-leader-keys-for-major-mode 'org-agenda-mode
@@ -255,12 +202,8 @@
   "fs" 'hs-show-all
   )
 
-(spacemacs/set-leader-keys-for-major-mode 'dired-mode
-  "C" 'wally/dired-fetch-latest-file
-  )
 
 (spacemacs/set-leader-keys-for-major-mode 'emacs-lisp-mode
-  "." 'eval-defun
   "b" 'wally/func-quick-bind-key-at-point
   "f" '(lambda () (interactive) (elisp-format-buffer) (delete-trailing-whitespace))
   "if" 'wally/func-insert-entry-info-at-point

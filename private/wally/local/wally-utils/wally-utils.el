@@ -25,9 +25,6 @@
         (message "phrase too long or too short")
       (highlight-phrase phrase 'hi-read))))
 
-(defun wally/unhighlight-symbol-at-point ()
-  (interactive)
-  (unhighlight-regexp (concat "\\_<" (thing-at-point 'symbol) "\\_>")))
 
 (defun wally/edit-copy-to-line-end ()
   (interactive)
@@ -139,32 +136,6 @@
    "
   (wally/buf-scroll-buffer (length (winum--available-numbers)) direction))
 
-(defun wally/buf-switch-to-message-buffer()
-  (interactive)
-  (switch-to-buffer "*Messages*")
-  (goto-char (point-max)))
-
-(defun wally/buf-switch-to-org-note-buffer()
-  (interactive)
-  (switch-to-buffer "*note*")
-  (org-mode))
-
-(defun wally/buf-switch-to-temp-buffer()
-  (interactive)
-  (switch-to-buffer "*tmp*")
-  (fundamental-mode))
-
-(defun wally/buf-switch-to-message-buffer()
-  (interactive)
-  (switch-to-buffer "*Messages*")
-  (goto-char (point-max)))
-
-(defun wally/buffer-switch-to-agenda()
-  (interactive)
-  (let ((buffer "*Org Agenda*"))
-    (if (not (get-buffer buffer))
-        (message "no agenda buffer")
-      (switch-to-buffer buffer))))
 
 (defun wally/buf-kill-all-buffers-under (dir)
   (let ((count 0)
