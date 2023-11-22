@@ -18,6 +18,7 @@
   "gd" 'magit-diff-buffer-file
   "hs" 'highlight-symbol-at-point
   "hu" '(lambda () (interactive) (unhighlight-regexp (concat "\\_<" (thing-at-point 'symbol) "\\_>")))
+  "ja" 'beginning-of-defun
   "pg" 'project-find-regexp
   "pA" 'helm-projectile-ack
   "qc" 'quick-calc
